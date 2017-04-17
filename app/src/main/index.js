@@ -2,7 +2,7 @@
 
 import electron from 'electron'
 
-const { app, BrowserWindow, ipcMain } = electron
+const { app, BrowserWindow, dialog, ipcMain } = electron
 
 let mainWindow,toolbarWindow
 
@@ -29,7 +29,8 @@ function createWindow () {
      frame: false,
      alwaysOnTop: true,
      resizable: false,
-     movable: false
+     movable: false,
+     hasShadow: false
    })
 
   mainWindow.loadURL(winURL)
@@ -48,7 +49,8 @@ function createWindow () {
     frame: false,
     alwaysOnTop: true,
     resizable: false,
-    movable: false
+    movable: false,
+    hasShadow: false
   })
 
   toolbarWindow.loadURL(toolbarURL)
@@ -59,6 +61,20 @@ function createWindow () {
 
   ipcMain.on('changePage', (evt, page) => {
     mainWindow.webContents.send('changePage', page)
+  })
+
+  ipcMain.on('quitApp', (evt, page) => {
+    dialog.showMessageBox({
+      type: 'warning',
+      message: '真的要退出Bilibili弹幕姬吗？',
+      buttons: ['是','否'],
+      defaultId: 0,
+      cancelId: 1
+    }, (res) => {
+      if (res === 0) {
+        app.quit()
+      }
+    })
   })
 
   // eslint-disable-next-line no-console

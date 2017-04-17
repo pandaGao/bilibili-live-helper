@@ -1,7 +1,60 @@
 <template>
   <div class="config-page">
-    <div class="form">
-      <input class="input is-small" type="text" placeholder="请输入房间号" v-model="roomId" @keyup.enter="setRoomId">
+    <div class="row">
+      <div class="field">
+        <input class="room-input" type="text" placeholder="请输入房间号" v-model="roomId" @keyup.enter="setRoomId"><button class="button room-button" @click="setRoomId">开启弹幕姬</button>
+      </div>
+    </div>
+    <div class="title">接收弹幕种类</div>
+    <div class="row">
+      <div class="field">
+        <label><input type="checkbox" v-model="config.welcomeMessage"> 老爷进入提示</label>
+      </div>
+      <div class="field">
+        <label><input type="checkbox" v-model="config.welcomeGuardMessage"> 舰队进入提示</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label><input type="checkbox" v-model="config.giftMessage"> 赠送礼物提示</label>
+      </div>
+      <div class="field">
+        <label><input type="checkbox" v-model="config.guardBuyMessage"> 舰队购买提示</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label><input type="checkbox" v-model="config.newFansMessage"> 房间关注提示</label>
+      </div>
+      <div class="field">
+        <label><input type="checkbox" v-model="config.blockMessage"> 禁言提示</label>
+      </div>
+    </div>
+    <div class="title">评论弹幕组成</div>
+    <div class="row">
+      <div class="field">
+        <label><input type="checkbox" v-model="config.showUserLevel"> 用户等级</label>
+      </div>
+      <div class="field">
+        <label><input type="checkbox" v-model="config.showUserBadge"> 用户勋章</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label><input type="checkbox" v-model="config.showUserVIP"> 年费标识</label>
+      </div>
+      <div class="field">
+        <label><input type="checkbox" v-model="config.showUserGuard"> 舰队标识</label>
+      </div>
+    </div>
+    <div class="title">其他功能</div>
+    <div class="row">
+      <div class="field">
+        <label><input type="checkbox" v-model="config.useGiftEnd"> 礼物打包提示</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="info">v0.1.0 by Ryan Gao <span class="github-page" @click="gotoGithub">查看新版</span></div>
     </div>
   </div>
 </template>
@@ -22,6 +75,13 @@
     mounted () {
       this.roomId = this.config.roomId
       this.win = this.$electron.remote.getCurrentWindow()
+      let workArea = this.$electron.screen.getPrimaryDisplay().workArea
+      this.win.setBounds({
+        x: workArea.x + workArea.width - 320,
+        y: workArea.y + workArea.height - 27 - 440,
+        width: 320,
+        height: 440
+      })
       this.win.setIgnoreMouseEvents(false)
     },
     methods: {
@@ -30,6 +90,9 @@
           this.config.roomId = this.roomId
           this.$root.currentPage = 'danmaku'
         }
+      },
+      gotoGithub () {
+        this.$electron.shell.openExternal('https://github.com/pandaGao/bilibili-live-helper')
       }
     }
   }
@@ -40,19 +103,62 @@
   position absolute
   bottom 0
   width 100%
-  padding 16px 8px
+  padding 8px 8px 0 8px
   border-radius 5px
   background-color rgba(0,0,0,0.6)
   overflow hidden
+  color #fff
+  font-size 14px
 
-input
-  padding 2px 4px
+.row
+  display flex
+  padding 8px
+  user-select none
+
+.field
+  flex 1
+  .room-input
+    width 10em
+    border-top-left-radius 4px
+    border-bottom-left-radius 4px
+    border-color #66ccff
+    color #66ccff
+    &::-webkit-input-placeholder
+      color #66ccff
+  .room-button
+    padding 6px 4px
+    border 1px solid #66ccff
+    border-top-right-radius 4px
+    border-bottom-right-radius 4px
+    vertical-align bottom
+    background-color rgba(0,0,0,0)
+    color #66ccff
+
+.title
+  margin 16px 8px
+  margin-bottom 4px
+  border-bottom 1px solid #66ccff
+  font-size 16px
+  color #66ccff
+
+.info
+  float right
+  .github-page
+    margin-left 1em
+    color #66ccff
+    cursor pointer
+
+input[type="checkbox"]
+  vertical-align middle
+
+input[type="text"]
+  padding 6px 8px
   border 0
-  border-bottom 1px solid rgba(255,255,255,0.6)
+  border 1px solid #fff
+  border-right 0
+  vertical-align bottom
   font-size 14px
   outline 0
-  color #fff
   background-color rgba(0,0,0,0)
-  &::-webkit-input-placeholder
-    color #fff
+
 </style>

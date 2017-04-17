@@ -22,13 +22,13 @@
           </div>
           <div v-else-if="danmaku.type == 'comment'" class="msg-comment">
             <span v-if="danmaku.user.isAdmin" class="admin-user">管</span>
-            <span v-if="danmaku.user.guard == 1" class="guard-user" :class="userGuardLevel(danmaku.user.guard)">总督</span>
-            <span v-if="danmaku.user.guard == 2" class="guard-user" :class="userGuardLevel(danmaku.user.guard)">提督</span>
-            <span v-if="danmaku.user.guard == 3" class="guard-user" :class="userGuardLevel(danmaku.user.guard)">舰长</span>
-            <span v-if="danmaku.user.isSVIP" class="svip-user">爷</span>
-            <span v-else-if="danmaku.user.isVIP" class="vip-user">爷</span>
-            <span v-if="danmaku.user.badge" class="user-badge" :class="userBadgeLevelColor(danmaku.user.badge.level)">{{ danmaku.user.badge.title+danmaku.user.badge.level }}</span>
-            <span v-if="danmaku.user.level" class="user-level" :class="userLevelColor(danmaku.user.level)">{{ "UL "+danmaku.user.level }}</span>
+            <span v-if="danmaku.user.guard == 1 && config.showUserGuard" class="guard-user" :class="userGuardLevel(danmaku.user.guard)">总督</span>
+            <span v-if="danmaku.user.guard == 2 && config.showUserGuard" class="guard-user" :class="userGuardLevel(danmaku.user.guard)">提督</span>
+            <span v-if="danmaku.user.guard == 3 && config.showUserGuard" class="guard-user" :class="userGuardLevel(danmaku.user.guard)">舰长</span>
+            <span v-if="danmaku.user.isSVIP && config.showUserVIP" class="svip-user">爷</span>
+            <span v-else-if="danmaku.user.isVIP && config.showUserVIP" class="vip-user">爷</span>
+            <span v-if="danmaku.user.badge && config.showUserBadge" class="user-badge" :class="userBadgeLevelColor(danmaku.user.badge.level)">{{ danmaku.user.badge.title+danmaku.user.badge.level }}</span>
+            <span v-if="danmaku.user.level && config.showUserLevel" class="user-level" :class="userLevelColor(danmaku.user.level)">{{ "UL "+danmaku.user.level }}</span>
             <span class="user-name">{{ danmaku.user.name }}:</span>
             <span class="user-comment">{{ danmaku.comment }}</span>
           </div>
@@ -65,13 +65,11 @@
 </template>
 
 <script>
-  import Live from 'bilibili-live/src/index.js'
-
   export default {
     data () {
       return {
         win: null,
-        danmakuList: [],
+        poolPointer: -1,
         visibleDanmakuList: [],
         roomOnlineNumber: '--',
         fansNumber: '--'
@@ -80,47 +78,30 @@
     computed: {
       config () {
         return this.$root.config
+      },
+      danmakuPool () {
+        return this.$root.danmakuPool
       }
     },
     watch: {
-      visibleDanmakuList () {
-
+      danmakuPool () {
+        this.updateDanmaku()
       }
     },
     mounted () {
       this.win = this.$electron.remote.getCurrentWindow()
+      let workArea = this.$electron.screen.getPrimaryDisplay().workArea
+      this.win.setBounds({
+        x: workArea.x + workArea.width - 320,
+        y: workArea.y,
+        width: 320,
+        height: workArea.height - 27
+      })
       this.win.setIgnoreMouseEvents(true)
-      this.initLiveService()
+      this.updateDanmaku()
     },
     methods: {
-      initLiveService () {
-        Live.initRoom({
-          roomId: this.config.roomId
-        }).then(room => {
-          room.on('data', (msg) => {
-            if (msg.type == 'online') {
-              this.roomOnlineNumber = msg.number
-            } else if (msg.type == 'fans') {
-              this.fansNumber = msg.total
-              msg.newFans.map((fan) => {
-                this.addDanmaku({
-                  type: 'newFans',
-                  user: fan
-                })
-              })
-            } else if (msg.type == 'gift') {
-
-            } else {
-              this.addDanmaku(msg)
-            }
-          }).on('giftEnd', (msg) => {
-            msg.type = 'gift'
-            this.addDanmaku(msg)
-          })
-        })
-      },
       addDanmaku (payload) {
-        this.danmakuList.push(payload)
         this.visibleDanmakuList.push(payload)
         setTimeout(() => {
           this.removeDanmaku()
@@ -137,6 +118,25 @@
       },
       userGuardLevel (level) {
         return "guard-user-"+level
+      },
+      updateDanmaku () {
+        let len = this.danmakuPool.length
+        if (this.poolPointer < 0) {
+          this.poolPointer = Math.max(0, len-10)
+        }
+        for (let i = this.poolPointer; i < len; i++) {
+          let msg = this.danmakuPool[i]
+          if (msg.type == 'online') {
+            this.roomOnlineNumber = msg.number
+          } else if (msg.type == 'fans') {
+            this.fansNumber = msg.total
+          } else {
+            if (this.config[msg.type+'Message']) {
+              this.addDanmaku(msg)
+            }
+          }
+        }
+        this.poolPointer = len
       }
     }
   }

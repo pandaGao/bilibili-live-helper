@@ -1,10 +1,10 @@
 <template>
   <div>
     <div class="toolbar">
-      <button class="button item"></button>
-      <button class="button item"></button>
-      <button class="button item" @click="gotoDanmaku">弹幕</button>
-      <button class="button item" @click="gotoConfig">设置</button>
+      <button class="button item" @click="gotoPage('config')">设置</button>
+      <button class="button item" @click="gotoPage('danmaku')">弹幕</button>
+      <button class="button item" @click="gotoPage('history')">历史</button>
+      <button class="button item" @click="quitApp">退出</button>
     </div>
   </div>
 </template>
@@ -17,11 +17,11 @@ export default {
     }
   },
   methods: {
-    gotoDanmaku () {
-      this.$electron.ipcRenderer.send('changePage', 'danmaku')
+    gotoPage (page) {
+      this.$electron.ipcRenderer.send('changePage', page)
     },
-    gotoConfig () {
-      this.$electron.ipcRenderer.send('changePage', 'config')
+    quitApp () {
+      this.$electron.ipcRenderer.send('quitApp')
     }
   }
 }
