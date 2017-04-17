@@ -2,6 +2,9 @@
 
  Bilibili直播弹幕姬 for Mac / Windows / Linux
 
+## Download
+[点此前往下载](https://pan.baidu.com/s/1clbflW)
+
 ## Features
 * 支持 MacOS Windows Linux
 * 老爷、用户等级、勋章等级标识同步B站原生颜色体系

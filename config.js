@@ -5,7 +5,7 @@ const path = require('path')
 let config = {
   // Name of electron app
   // Will be used in production builds
-  name: 'Bilibili直播弹幕机',
+  name: 'Bilibili直播弹幕姬',
 
   // Use ESLint (extends `standard`)
   // Further changes can be made in `.eslintrc.js`
