@@ -19,9 +19,15 @@
 * 弹幕模式下弹幕窗口置顶显示 不会影响正常的屏幕点击
 
 ## Messages
- * 目前版本(v1.6.2)的Electron对Linux系统中的透明窗口处理有一些问题 导致体验很差 故暂时不发布Linux版本
  * 这个项目还有很大的提升空间 欢迎提issue和PR
- * Please star if you like it : )
+ * Linux用户在启动时需要加上`--enable-transparent-visuals` 和 `--disable-gpu` 参数以支持透明窗口
+
+## Change Logs
+* 2017-04-21 - v0.2.0
+  * 工具栏增加拖动按钮 可以移动弹幕姬窗口位置
+  * 支持显示礼物图片
+  * 微调工具栏样式 增加icon
+  * 发布支持透明窗口的Linux版本
 
 ## License
 MIT

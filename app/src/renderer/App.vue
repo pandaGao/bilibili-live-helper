@@ -21,6 +21,7 @@
     },
     data () {
       return {
+        win: null,
         currentPage: 'config',
         config: {
           roomId: '',
@@ -40,7 +41,7 @@
           useGiftEnd: true
         },
         danmakuPool: [],
-        danmakuService: null
+        danmakuService: null,
       }
     },
     computed: {
@@ -55,8 +56,12 @@
       }
     },
     mounted () {
+      this.win = this.$electron.remote.getCurrentWindow()
       this.$electron.ipcRenderer.on('changePage', (evt, page) => {
         this.currentPage = page
+      })
+      this.$electron.ipcRenderer.on('move', (evt, x, y) => {
+        this.resetWindow(x, y)
       })
     },
     methods: {
@@ -97,6 +102,16 @@
       },
       addDanmaku (danmaku) {
         this.danmakuPool.push(danmaku)
+      },
+      resetWindow (x, y) {
+        let workArea = this.$electron.screen.getPrimaryDisplay().workArea
+        let bound = this.win.getBounds()
+        this.win.setBounds({
+          x: x,
+          y: workArea.y,
+          width: 320,
+          height: y - workArea.y
+        })
       }
     }
   }
@@ -111,14 +126,15 @@
 
 html, body
   height 100%
-  background-color rgba(0,0,0,0)
   border-radius 0
   overflow hidden
   font-family -apple-system,SF UI Text,Arial,PingFang SC,Hiragino Sans GB,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif
+
 #app
   width 100%
   height 100%
   overflow hidden
+
 
 .button
   display inline-block
@@ -130,4 +146,5 @@ html, body
   white-space nowrap
   outline 0
   font-size 14px
+  line-height 16px
 </style>

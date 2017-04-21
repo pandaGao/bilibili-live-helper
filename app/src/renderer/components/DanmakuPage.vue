@@ -35,6 +35,7 @@
           <div v-else-if="danmaku.type == 'gift'" class="msg-gift">
             <span class="user-name">{{ danmaku.user.name }}</span>
             <span class="gift-action">赠送</span>
+            <span class="gift-img"><img :src="giftImage(danmaku.gift.id)"></span>
             <span class="user-gift">{{ `${danmaku.gift.name} × ${danmaku.gift.count}` }}</span>
           </div>
           <div v-else-if="danmaku.type == 'guardBuy'" class="msg-guard-buy">
@@ -89,15 +90,7 @@
       }
     },
     mounted () {
-      this.win = this.$electron.remote.getCurrentWindow()
-      let workArea = this.$electron.screen.getPrimaryDisplay().workArea
-      this.win.setBounds({
-        x: workArea.x + workArea.width - 320,
-        y: workArea.y,
-        width: 320,
-        height: workArea.height - 27
-      })
-      this.win.setIgnoreMouseEvents(true)
+      this.$electron.remote.getCurrentWindow().setIgnoreMouseEvents(true)
       this.updateDanmaku()
     },
     methods: {
@@ -118,6 +111,9 @@
       },
       userGuardLevel (level) {
         return "guard-user-"+level
+      },
+      giftImage (id) {
+        return `http://static.hdslb.com/live-static/live-room/images/gift-section/gift-${id}.png`
       },
       updateDanmaku () {
         let len = this.danmakuPool.length
@@ -157,9 +153,9 @@
   .item
     flex 1
     color #fff
-    background-color rgba(0,0,0,0.6)
+    background-color rgba(25,25,25,.8)
   .item + .item
-    margin-left 2px
+    margin-left 1px
   .online
     display inline-block
     padding 5px 8px
@@ -183,11 +179,11 @@
 .danmaku-list
   position absolute
   left 0
-  bottom 28px
+  bottom 27px
   width 100%
   border-radius 5px
   overflow hidden
-  background-color rgba(0,0,0,0.6)
+  background-color rgba(25,25,25,.8)
 
 .danmaku-box
   padding 4px 8px
@@ -252,6 +248,8 @@
   .guard-user-3
     color #e6c28b
   .msg-gift
+    .gift-img > img
+      height 32px
     .user-name
       color #ff8f34
 </style>

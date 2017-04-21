@@ -54,7 +54,7 @@
       </div>
     </div>
     <div class="row">
-      <div class="info">v0.1.0 by Ryan Gao <span class="github-page" @click="gotoGithub">查看新版</span></div>
+      <div class="info">v0.2.0 by Ryan Gao <span class="github-page" @click="gotoGithub">查看新版</span></div>
     </div>
   </div>
 </template>
@@ -63,8 +63,7 @@
   export default {
     data () {
       return {
-        roomId: '',
-        win: null
+        roomId: ''
       }
     },
     computed: {
@@ -74,15 +73,7 @@
     },
     mounted () {
       this.roomId = this.config.roomId
-      this.win = this.$electron.remote.getCurrentWindow()
-      let workArea = this.$electron.screen.getPrimaryDisplay().workArea
-      this.win.setBounds({
-        x: workArea.x + workArea.width - 320,
-        y: workArea.y + workArea.height - 27 - 440,
-        width: 320,
-        height: 440
-      })
-      this.win.setIgnoreMouseEvents(false)
+      this.$electron.remote.getCurrentWindow().setIgnoreMouseEvents(false)
     },
     methods: {
       setRoomId () {
@@ -103,16 +94,21 @@
   position absolute
   bottom 0
   width 100%
+  height 100%
   padding 8px 8px 0 8px
   border-radius 5px
-  background-color rgba(0,0,0,0.6)
-  overflow hidden
+  background-color rgba(25,25,25,.8)
+  overflow-y scroll
   color #fff
   font-size 14px
+  &::-webkit-scrollbar
+    width 4px
+  &::-webkit-scrollbar-thumb
+    background-color #666
 
 .row
   display flex
-  padding 8px
+  padding 6px 8px
   user-select none
 
 .field
@@ -126,7 +122,7 @@
     &::-webkit-input-placeholder
       color #66ccff
   .room-button
-    padding 6px 4px
+    padding 6px
     border 1px solid #66ccff
     border-top-right-radius 4px
     border-bottom-right-radius 4px
@@ -158,6 +154,7 @@ input[type="text"]
   border-right 0
   vertical-align bottom
   font-size 14px
+  line-height 16px
   outline 0
   background-color rgba(0,0,0,0)
 

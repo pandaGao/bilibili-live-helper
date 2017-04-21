@@ -20,7 +20,31 @@ function createWindow () {
    */
    const workArea = electron.screen.getPrimaryDisplay().workArea
 
+   toolbarWindow = new BrowserWindow({
+     height: 27,
+     width: 320,
+     x: workArea.x + workArea.width - 320,
+     y: workArea.y + workArea.height - 27,
+     transparent: true,
+     frame: false,
+     alwaysOnTop: true,
+     resizable: false,
+     hasShadow: false
+   })
+
+   toolbarWindow.loadURL(toolbarURL)
+
+   toolbarWindow.on('closed', () => {
+     toolbarWindow = null
+   })
+
+   toolbarWindow.on('move', () => {
+     let bound = toolbarWindow.getBounds()
+     mainWindow.webContents.send('move', bound.x, bound.y)
+   })
+
    mainWindow = new BrowserWindow({
+     parent: toolbarWindow,
      height: workArea.height - 27,
      width: 320,
      x: workArea.x + workArea.width - 320,
@@ -37,26 +61,6 @@ function createWindow () {
 
   mainWindow.on('closed', () => {
     mainWindow = null
-  })
-
-  toolbarWindow = new BrowserWindow({
-    parent: mainWindow,
-    height: 27,
-    width: 320,
-    x: workArea.x + workArea.width - 320,
-    y: workArea.y + workArea.height - 27,
-    transparent: true,
-    frame: false,
-    alwaysOnTop: true,
-    resizable: false,
-    movable: false,
-    hasShadow: false
-  })
-
-  toolbarWindow.loadURL(toolbarURL)
-
-  toolbarWindow.on('closed', () => {
-    toolbarWindow = null
   })
 
   ipcMain.on('changePage', (evt, page) => {

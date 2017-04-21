@@ -34,6 +34,7 @@
         <div v-else-if="danmaku.type == 'gift'" class="msg-gift">
           <span class="user-name">{{ danmaku.user.name }}</span>
           <span class="gift-action">赠送</span>
+          <span class="gift-img"><img :src="giftImage(danmaku.gift.id)"></span>
           <span class="user-gift">{{ `${danmaku.gift.name} × ${danmaku.gift.count}` }}</span>
         </div>
         <div v-else-if="danmaku.type == 'guardBuy'" class="msg-guard-buy">
@@ -72,15 +73,7 @@
       }
     },
     mounted () {
-      this.win = this.$electron.remote.getCurrentWindow()
-      let workArea = this.$electron.screen.getPrimaryDisplay().workArea
-      this.win.setBounds({
-        x: workArea.x + workArea.width - 320,
-        y: workArea.y,
-        width: 320,
-        height: workArea.height - 27
-      })
-      this.win.setIgnoreMouseEvents(false)
+      this.$electron.remote.getCurrentWindow().setIgnoreMouseEvents(false)
       this.$nextTick(() => {
         this.$refs.list.scrollTop = this.$refs.list.scrollHeight
       })
@@ -94,6 +87,9 @@
       },
       userGuardLevel (level) {
         return "guard-user-"+level
+      },
+      giftImage (id) {
+        return `http://static.hdslb.com/live-static/live-room/images/gift-section/gift-${id}.png`
       }
     }
   }
@@ -108,13 +104,13 @@
   height 100%
   border-radius 5px
   overflow-y scroll
-  background-color rgba(0,0,0,0.6)
+  background-color rgba(25,25,25,.8)
   &::-webkit-scrollbar
     width 4px
   &::-webkit-scrollbar-track
     -webkit-box-shadow inset 0 0 6px rgba(0,0,0,0.6)
   &::-webkit-scrollbar-thumb
-    background-color #fff
+    background-color #666
 
 .history-danmaku-box
   padding 4px 8px
@@ -179,6 +175,8 @@
   .guard-user-3
     color #e6c28b
   .msg-gift
+    .gift-img > img
+      height 32px
     .user-name
       color #ff8f34
 </style>
