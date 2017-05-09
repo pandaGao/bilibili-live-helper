@@ -1,69 +1,22 @@
 <template>
   <div class="config-page">
-    <div class="row">
-      <div class="field">
-        <input class="room-input" type="text" placeholder="请输入房间号" v-model="roomId" @keyup.enter="setRoomId"><button class="button room-button" @click="setRoomId">开启弹幕姬</button>
-      </div>
-    </div>
-    <div class="title">接收弹幕种类</div>
-    <div class="row">
-      <div class="field">
-        <label><input type="checkbox" v-model="config.welcomeMessage"> 老爷进入提示</label>
-      </div>
-      <div class="field">
-        <label><input type="checkbox" v-model="config.welcomeGuardMessage"> 舰队进入提示</label>
-      </div>
-    </div>
-    <div class="row">
-      <div class="field">
-        <label><input type="checkbox" v-model="config.giftMessage"> 赠送礼物提示</label>
-      </div>
-      <div class="field">
-        <label><input type="checkbox" v-model="config.guardBuyMessage"> 舰队购买提示</label>
-      </div>
-    </div>
-    <div class="row">
-      <div class="field">
-        <label><input type="checkbox" v-model="config.newFansMessage"> 房间关注提示</label>
-      </div>
-      <div class="field">
-        <label><input type="checkbox" v-model="config.blockMessage"> 禁言提示</label>
-      </div>
-    </div>
-    <div class="title">评论弹幕组成</div>
-    <div class="row">
-      <div class="field">
-        <label><input type="checkbox" v-model="config.showUserLevel"> 用户等级</label>
-      </div>
-      <div class="field">
-        <label><input type="checkbox" v-model="config.showUserBadge"> 用户勋章</label>
-      </div>
-    </div>
-    <div class="row">
-      <div class="field">
-        <label><input type="checkbox" v-model="config.showUserVIP"> 年费标识</label>
-      </div>
-      <div class="field">
-        <label><input type="checkbox" v-model="config.showUserGuard"> 舰队标识</label>
-      </div>
-    </div>
-    <div class="title">其他功能</div>
-    <div class="row">
-      <div class="field">
-        <label><input type="checkbox" v-model="config.useGiftEnd"> 礼物打包提示</label>
-      </div>
-    </div>
-    <div class="row">
-      <div class="info">v0.2.0 by Ryan Gao <span class="github-page" @click="gotoGithub">查看新版</span></div>
-    </div>
+    <danmaku-config></danmaku-config>
+    <user-config></user-config>
   </div>
 </template>
 
 <script>
+  import UserConfig from './UserConfig.vue'
+  import DanmakuConfig from './DanmakuConfig.vue'
+
   export default {
+    components: {
+      DanmakuConfig,
+      UserConfig
+    },
     data () {
       return {
-        roomId: ''
+        currentConfig: 'danmaku'
       }
     },
     computed: {
@@ -72,15 +25,11 @@
       }
     },
     mounted () {
-      this.roomId = this.config.roomId
       this.$electron.remote.getCurrentWindow().setIgnoreMouseEvents(false)
     },
     methods: {
-      setRoomId () {
-        if (this.roomId) {
-          this.config.roomId = this.roomId
-          this.$root.currentPage = 'danmaku'
-        }
+      gotoTab (tab) {
+        this.currentConfig = tab
       },
       gotoGithub () {
         this.$electron.shell.openExternal('https://github.com/pandaGao/bilibili-live-helper')
@@ -90,9 +39,27 @@
 </script>
 
 <style lang="stylus">
+.config-menu
+  position fixed
+  top 0
+  left 0
+  display flex
+  width 100%
+  border-radius 5px
+  overflow hidden
+  .item
+    flex 1
+    padding 5px 8px
+    font-size 14px
+    line-height 16px
+    text-align center
+    background-color rgba(25,25,25,.8)
+  .item + .item
+    margin-left 1px
+
 .config-page
   position absolute
-  bottom 0
+  top 0
   width 100%
   height 100%
   padding 8px 8px 0 8px
@@ -110,9 +77,15 @@
   display flex
   padding 6px 8px
   user-select none
+  .text
+    flex 1
+    font-size 14px
+    line-height 16px
 
 .field
   flex 1
+  label
+    user-select none
   .room-input
     width 10em
     border-top-left-radius 4px

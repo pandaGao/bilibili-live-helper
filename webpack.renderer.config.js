@@ -15,7 +15,8 @@ let rendererConfig = {
   devServer: { overlay: true },
   entry: {
     renderer: path.join(__dirname, 'app/src/renderer/main.js'),
-    toolbar: path.join(__dirname, 'app/src/toolbar/main.js')
+    toolbar: path.join(__dirname, 'app/src/toolbar/main.js'),
+    login: path.join(__dirname, 'app/src/login/main.js')
   },
   externals: Object.keys(pkg.dependencies || {}),
   module: {
@@ -97,6 +98,14 @@ let rendererConfig = {
         ? path.resolve(__dirname, 'app/node_modules')
         : false,
       chunks: ['toolbar']
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'login.html',
+      template: './app/login.ejs',
+      appModules: process.env.NODE_ENV !== 'production'
+        ? path.resolve(__dirname, 'app/node_modules')
+        : false,
+      chunks: ['login']
     }),
     new webpack.NoEmitOnErrorsPlugin()
   ],

@@ -4,7 +4,7 @@ import electron from 'electron'
 
 const { app, BrowserWindow, dialog, ipcMain } = electron
 
-let mainWindow,toolbarWindow
+let mainWindow,toolbarWindow,loginWindow
 
 const winURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:${require('../../../config').port}`
@@ -14,7 +14,11 @@ const toolbarURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:${require('../../../config').port}/toolbar.html`
   : `file://${__dirname}/toolbar.html`
 
-function createWindow () {
+const loginURL = process.env.NODE_ENV === 'development'
+  ? `http://localhost:${require('../../../config').port}/login.html`
+  : `file://${__dirname}/login.html`
+
+function createMainWindow () {
   /**
    * Initial window options
    */
@@ -67,7 +71,27 @@ function createWindow () {
     mainWindow.webContents.send('changePage', page)
   })
 
-  ipcMain.on('quitApp', (evt, page) => {
+  ipcMain.on('openLogin', (evt) => {
+    if (loginWindow) return
+    loginWindow = new BrowserWindow({
+      parent: mainWindow,
+      width: 340,
+      height: 272,
+      useContentSize: true,
+      resizable: false
+    })
+    loginWindow.loadURL(loginURL)
+    loginWindow.on('close', () => {
+      loginWindow = null
+    })
+  })
+
+  ipcMain.on('closeLogin', (evt, cookie) => {
+    loginWindow.close()
+    mainWindow.webContents.send('updateCookie', cookie)
+  })
+
+  ipcMain.on('quitApp', (evt) => {
     dialog.showMessageBox({
       type: 'warning',
       message: '真的要退出Bilibili弹幕姬吗？',
@@ -85,7 +109,7 @@ function createWindow () {
   console.log('mainWindow opened')
 }
 
-app.on('ready', createWindow)
+app.on('ready', createMainWindow)
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -95,6 +119,6 @@ app.on('window-all-closed', () => {
 
 app.on('activate', () => {
   if (mainWindow === null) {
-    createWindow()
+    createMainWindow()
   }
 })

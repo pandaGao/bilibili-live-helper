@@ -92,13 +92,19 @@
     mounted () {
       this.$electron.remote.getCurrentWindow().setIgnoreMouseEvents(true)
       this.updateDanmaku()
+      if (this.config.danmakuDisplayTime < 5) {
+        this.config.danmakuDisplayTime = 5
+      }
+      if (this.config.danmakuDisplayTime > 999) {
+        this.config.danmakuDisplayTime = 999
+      }
     },
     methods: {
       addDanmaku (payload) {
         this.visibleDanmakuList.push(payload)
         setTimeout(() => {
           this.removeDanmaku()
-        }, 10000)
+        }, this.config.danmakuDisplayTime*1000)
       },
       removeDanmaku () {
         this.visibleDanmakuList.splice(0,1)
