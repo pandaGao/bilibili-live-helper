@@ -15,6 +15,8 @@
 
   import Live from 'bilibili-live/src/index.js'
   import UserDataStore from './utils/UserDataStore.js'
+  import Statistic from './utils/Statistic.js'
+  import os from 'os'
 
   export default {
     components: {
@@ -25,6 +27,8 @@
     },
     data () {
       return {
+        version: '0.3.0',
+        needUpdate: false,
         win: null,
         currentPage: 'config',
         roomId: '',
@@ -47,6 +51,9 @@
           danmakuDisplayTime: 10
         },
         danmakuPool: [],
+        roomFansPool: [],
+        roomOnlineUser: '--',
+        roomFans: '--',
         danmakuService: null,
         userService: null,
         userConfigStore: null
@@ -81,11 +88,15 @@
         this.loginUser(cookie)
         this.saveConfig()
       })
+      this.checkUpdate()
       this.loadConfig()
     },
     methods: {
       loadConfig () {
-        this.userConfigStore = new UserDataStore({fileName: 'UserConfig'})
+        this.userConfigStore = new UserDataStore({
+          electron: this.$electron,
+          fileName: 'UserConfig'
+        })
         let userConfig = this.userConfigStore.get()
         if (!userConfig) {
           this.saveConfig()
@@ -106,6 +117,10 @@
       startDanmakuService () {
         if (this.danmakuService) {
           this.danmakuService.removeAllListeners()
+          this.danmakuService.disconnect()
+          this.danmakuService = null
+          this.roomOnlineUser = '--'
+          this.roomFans = '--'
         }
         return Live.initRoom({
           roomId: this.roomId
@@ -115,8 +130,10 @@
               if (!this.config.useGiftEnd) {
                 this.addDanmaku(msg)
               }
+            } else if (msg.type == 'online') {
+              this.addFans(msg)
             } else if (msg.type == 'fans') {
-              this.addDanmaku({
+              this.addFans({
                 type: 'fans',
                 total: msg.total
               })
@@ -146,6 +163,14 @@
       addDanmaku (danmaku) {
         this.danmakuPool.push(danmaku)
       },
+      addFans (danmaku) {
+        this.roomFansPool.push(danmaku)
+        if (danmaku.type == 'online') {
+          this.roomOnlineUser = danmaku.number
+        } else if (danmaku.type == 'fans') {
+          this.roomFans = danmaku.total
+        }
+      },
       resetWindow (x, y) {
         let workArea = this.$electron.screen.getPrimaryDisplay().workArea
         let bound = this.win.getBounds()
@@ -164,6 +189,7 @@
           if (!user) return
           user.setCurrentRoom(this.roomId)
           this.userService = user
+          Statistic.userLogin(this.version, os.platform(), user.getUserInfo().id, user.getUserRoom().id)
           this.$emit('userLogin')
         })
       },
@@ -171,13 +197,19 @@
         this.cookie = ''
         this.userService = null
         this.$emit('userLogout')
+      },
+      checkUpdate() {
+        Statistic.checkUpdate(this.version, os.platform()).then(res => {
+          let data = res.json().then(json => {
+            this.needUpdate = json.needUpdate
+          })
+        })
       }
     }
   }
 </script>
 
 <style lang="stylus">
-
 *
   margin 0
   padding 0
@@ -194,7 +226,6 @@ html, body
   height 100%
   overflow hidden
 
-
 .button
   display inline-block
   padding 4px 0
@@ -206,4 +237,5 @@ html, body
   outline 0
   font-size 14px
   line-height 16px
+  cursor pointer
 </style>

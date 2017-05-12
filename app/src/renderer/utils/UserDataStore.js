@@ -1,11 +1,10 @@
-import electron from 'electron'
 import path from 'path'
 import fs from 'fs'
 import _ from 'lodash'
 
 export default class UserDataStore {
   constructor (config) {
-    const userDataPath = (electron.app || electron.remote.app).getPath('userData')
+    const userDataPath = config.electron.remote.app.getPath('userData')
     this.filePath = path.join(userDataPath, config.fileName + '.json')
     this.content = this.parseFile()
     this.tempContent = null

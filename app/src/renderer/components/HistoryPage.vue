@@ -1,8 +1,12 @@
 <template>
   <div class="history-page">
-    <div class="history-danmaku-container"
+    <div class="history-danmaku-container" ref="container"
       @mouseenter="enterDanmakuArea"
-      @mouseleave="leaveDanmakuArea">
+      @mouseleave="leaveDanmakuArea"
+      @mousewheel="scrollDanmakuArea">
+      <div class="history-danmaku-scrollbar">
+        <div class="history-danmaku-cursor" ref="cursor"></div>
+      </div>
       <div class="history-danmaku-list" ref="list">
         <div class="history-danmaku-box" v-for="(danmaku, index) in danmakuList">
           <div v-if="danmaku.type == 'connected'" class="msg-connected">弹幕服务器连接成功...</div>
@@ -85,9 +89,7 @@
     },
     computed: {
       danmakuList () {
-        return this.$root.danmakuPool.filter((danmaku) => {
-          return (danmaku.type === 'welcome' || danmaku.type === 'welcomeGuard' || danmaku.type === 'comment' || danmaku.type === 'gift' || danmaku.type === 'guardBuy' || danmaku.type === 'block' || danmaku.type === 'newFans')
-        })
+        return this.$root.danmakuPool
       },
       user () {
         return this.$root.userService
@@ -105,6 +107,7 @@
         if (!this.inDanmaku) {
           this.$nextTick(() => {
             this.$refs.list.scrollTop = this.$refs.list.scrollHeight
+            this.scrollCursorStyle()
           })
         }
       }
@@ -121,6 +124,21 @@
       },
       leaveDanmakuArea () {
         this.inDanmaku = false
+      },
+      scrollDanmakuArea (e) {
+        this.$refs.list.scrollTop += e.deltaY
+        this.scrollCursorStyle()
+      },
+      scrollCursorStyle () {
+        let height = this.$refs.container.clientHeight / this.$refs.list.scrollHeight * 100
+        let top = (this.$refs.list.scrollTop + this.$refs.list.clientHeight) / this.$refs.list.scrollHeight * 100
+        if (height == 100) {
+          this.$refs.cursor.style.backgroundColor = 'transparent'
+        } else {
+          this.$refs.cursor.style.backgroundColor = 'white'
+          this.$refs.cursor.style.height = height + '%'
+          this.$refs.cursor.style.top = top - height < 0 ? '0%' : (top - height) + '%'
+        }
       },
       userLevelColor (level) {
         return "user-level-"+Math.ceil(Number(level)/10)
@@ -166,17 +184,25 @@
   height calc(100% - 33px)
   background-color rgba(25,25,25,.8)
 
+.history-danmaku-scrollbar
+  position absolute
+  top 0
+  right 0
+  width 4px
+  height 100%
+  background-color rgba(0,0,0,.6)
+  .history-danmaku-cursor
+    position absolute
+    left 0
+    width 4px
+    background-color white
+    z-index 99
+
 .history-danmaku-list
   width 100%
   height 100%
-  overflow-y scroll
+  overflow hidden
   background-color transparent
-  &::-webkit-scrollbar
-    width 4px
-  &::-webkit-scrollbar-track
-    -webkit-box-shadow inset 0 0 6px rgba(0,0,0,0.6)
-  &::-webkit-scrollbar-thumb
-    background-color #666
 
 .history-danmaku-box
   padding 4px 8px
@@ -223,15 +249,15 @@
     padding 1px 2px
     border-radius 4px
   .user-badge-level-1
-    background-color #64d07b
+    background-color #61decb
   .user-badge-level-2
-    background-color #20bdf2
+    background-color #5896de
   .user-badge-level-3
-    background-color #9951db
+    background-color #a068f1
   .user-badge-level-4
-    background-color #f1586c
+    background-color #ff86b2
   .user-badge-level-5
-    background-color #f2c31d
+    background-color #f6be18
   .guard-user
     padding 1px 2px
     border-radius 4px

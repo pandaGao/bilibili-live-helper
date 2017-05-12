@@ -71,9 +71,7 @@
       return {
         win: null,
         poolPointer: -1,
-        visibleDanmakuList: [],
-        roomOnlineNumber: '--',
-        fansNumber: '--'
+        visibleDanmakuList: []
       }
     },
     computed: {
@@ -82,6 +80,12 @@
       },
       danmakuPool () {
         return this.$root.danmakuPool
+      },
+      roomOnlineNumber () {
+        return this.$root.roomOnlineUser
+      },
+      fansNumber () {
+        return this.$root.roomFans
       }
     },
     watch: {
@@ -128,14 +132,8 @@
         }
         for (let i = this.poolPointer; i < len; i++) {
           let msg = this.danmakuPool[i]
-          if (msg.type == 'online') {
-            this.roomOnlineNumber = msg.number
-          } else if (msg.type == 'fans') {
-            this.fansNumber = msg.total
-          } else {
-            if (this.config[msg.type+'Message']) {
-              this.addDanmaku(msg)
-            }
+          if (this.config[msg.type+'Message']) {
+            this.addDanmaku(msg)
           }
         }
         this.poolPointer = len
@@ -233,15 +231,15 @@
     padding 1px 2px
     border-radius 4px
   .user-badge-level-1
-    background-color #64d07b
+    background-color #61decb
   .user-badge-level-2
-    background-color #20bdf2
+    background-color #5896de
   .user-badge-level-3
-    background-color #9951db
+    background-color #a068f1
   .user-badge-level-4
-    background-color #f1586c
+    background-color #ff86b2
   .user-badge-level-5
-    background-color #f2c31d
+    background-color #f6be18
   .guard-user
     padding 1px 2px
     border-radius 4px

@@ -1,9 +1,11 @@
 .DS_Store
 app/dist/index.html
 app/dist/toolbar.html
+app/dist/login.html
 app/dist/main.js
 app/dist/renderer.js
 app/dist/toolbar.js
+app/dist/login.js
 app/dist/styles.css
 builds/*
 coverage

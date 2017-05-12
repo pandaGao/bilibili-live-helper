@@ -26,7 +26,8 @@
       </div>
       <div class="row">
         <div class="text">
-          <button class="button user-btn" @click="gotoMyRoom">前往我的直播间</button>
+          <button class="button user-btn" v-if="userRoom.id" @click="gotoMyRoom">前往直播间</button>
+          <button class="button user-btn" v-if="userRoom.id" @click="openMyRoom">浏览器打开直播间</button>
           <button class="button user-btn" style="float: right" @click="logout">登出</button>
         </div>
       </div>
@@ -69,6 +70,9 @@ export default {
     gotoMyRoom () {
       this.$root.roomId = this.userRoom.id
       this.$root.currentPage = 'danmaku'
+    },
+    openMyRoom () {
+      this.$electron.shell.openExternal('http://live.bilibili.com/'+this.userRoom.id)
     },
     logout () {
       this.$root.logoutUser()

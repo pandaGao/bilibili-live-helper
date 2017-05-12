@@ -3,7 +3,7 @@
  Bilibili直播弹幕姬 for Mac / Windows / Linux
 
 ## Download
-[点此前往下载](https://pan.baidu.com/s/1clbflW)
+[点此前往下载](http://bilibili.danmaku.live)
 
 ## Features
 * 支持 MacOS Windows Linux
@@ -23,6 +23,18 @@
  * Linux用户在启动时需要加上`--enable-transparent-visuals` 和 `--disable-gpu` 参数以支持透明窗口
 
 ## Change Logs
+* 2017-05-12 - v0.3.0
+  * 新增登录功能
+  * 设置界面显示登录后显示用户信息
+  * 设置界面新增弹幕停留时间设定
+  * 历史界面添加登录后相关功能
+    * 一键禁言用户
+    * 弹幕发送
+  * 自动保存用户设置以及登录信息
+  * 自动检查更新，有新版本时提醒
+  * 添加关于界面
+  * 界面UI优化
+  * 弹幕池优化
 * 2017-04-21 - v0.2.0
   * 工具栏增加拖动按钮 可以移动弹幕姬窗口位置
   * 支持显示礼物图片
