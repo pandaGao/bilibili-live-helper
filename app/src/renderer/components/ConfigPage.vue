@@ -39,9 +39,6 @@
         return this.$root.needUpdate
       }
     },
-    mounted () {
-      this.$electron.remote.getCurrentWindow().setIgnoreMouseEvents(false)
-    },
     methods: {
       gotoTab (tab) {
         this.currentConfig = tab

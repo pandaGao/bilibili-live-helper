@@ -91,6 +91,11 @@ function createMainWindow () {
     mainWindow.webContents.send('updateCookie', cookie)
   })
 
+  ipcMain.on('setHideToolbar', (evt, hide) => {
+    toolbarWindow.setAlwaysOnTop(!hide)
+    mainWindow.setAlwaysOnTop(true)
+  })
+
   ipcMain.on('quitApp', (evt) => {
     dialog.showMessageBox({
       type: 'warning',

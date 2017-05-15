@@ -47,10 +47,18 @@
         <checkbox v-model="config.showUserGuard" label="舰队标识"></checkbox>
       </div>
     </div>
-    <div class="title">其他功能</div>
+    <div class="title">弹幕视图设置</div>
     <div class="row">
       <div class="field">
         <checkbox v-model="config.useGiftEnd" label="礼物打包提示"></checkbox>
+      </div>
+      <div class="field">
+        <checkbox v-model="config.hideToolbar" label="游戏模式"></checkbox>
+      </div>
+    </div>
+    <div class="row">
+      <div class="field">
+        <numberinput v-model="config.danmakuFontSize" label="弹幕文字大小" unit="px"></numberinput>
       </div>
     </div>
     <div class="row">

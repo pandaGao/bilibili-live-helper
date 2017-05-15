@@ -27,7 +27,7 @@
     },
     data () {
       return {
-        version: '0.3.0',
+        version: '0.3.1',
         needUpdate: false,
         win: null,
         currentPage: 'config',
@@ -48,6 +48,8 @@
           showUserVIP: true,
           showUserGuard: true,
           useGiftEnd: true,
+          hideToolbar: false,
+          danmakuFontSize: 14,
           danmakuDisplayTime: 10
         },
         danmakuPool: [],

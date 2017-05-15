@@ -1,8 +1,11 @@
 <template>
   <div class="danmaku-page" ref="page">
-    <div class="danmaku-list" ref="list">
+    <div class="danmaku-list" ref="list" :style="danmakuListStyle">
       <transition-group name="danmaku">
-        <div class="danmaku-box" v-for="danmaku in visibleDanmakuList" :key="danmaku">
+        <div class="danmaku-box"
+          v-for="danmaku in visibleDanmakuList"
+          :key="danmaku"
+          :style="danmakuBoxStyle">
           <div v-if="danmaku.type == 'connected'" class="msg-connected">弹幕服务器连接成功...</div>
           <div v-else-if="danmaku.type == 'error'" class="msg-error">连接发生错误，3秒后自动重连...</div>
           <div v-else-if="danmaku.type == 'live'" class="msg-live">开始直播啦！</div>
@@ -58,7 +61,7 @@
         </div>
       </transition-group>
     </div>
-    <div class="toolbar">
+    <div class="toolbar" v-if="!config.hideToolbar">
       <div class="online item">房间人数<span>{{ roomOnlineNumber }}</span></div>
       <div class="online item">关注人数<span>{{ fansNumber }}</span></div>
     </div>
@@ -86,6 +89,18 @@
       },
       fansNumber () {
         return this.$root.roomFans
+      },
+      danmakuBoxStyle () {
+        return {
+          fontSize: this.config.danmakuFontSize + 'px',
+          lineHeight: (this.config.danmakuFontSize*3/2) + 'px'
+        }
+      },
+      danmakuListStyle () {
+        return {
+          backgroundColor: this.config.hideToolbar ? 'rgba(25,25,25,.4)' : 'rgba(25,25,25,.8)',
+          bottom: this.config.hideToolbar ? 0 : '27px'
+        }
       }
     },
     watch: {
@@ -94,7 +109,6 @@
       }
     },
     mounted () {
-      this.$electron.remote.getCurrentWindow().setIgnoreMouseEvents(true)
       this.updateDanmaku()
       if (this.config.danmakuDisplayTime < 5) {
         this.config.danmakuDisplayTime = 5
@@ -102,6 +116,18 @@
       if (this.config.danmakuDisplayTime > 999) {
         this.config.danmakuDisplayTime = 999
       }
+      if (this.config.danmakuFontSize < 10) {
+        this.config.danmakuFontSize = 10
+      }
+      if (this.config.danmakuFontSize > 64) {
+        this.config.danmakuFontSize = 64
+      }
+      this.$electron.remote.getCurrentWindow().setIgnoreMouseEvents(true)
+      this.$electron.ipcRenderer.send('setHideToolbar', this.config.hideToolbar)
+    },
+    beforeDestroy () {
+      this.$electron.remote.getCurrentWindow().setIgnoreMouseEvents(false)
+      this.$electron.ipcRenderer.send('setHideToolbar', false)
     },
     methods: {
       addDanmaku (payload) {
@@ -183,16 +209,12 @@
 .danmaku-list
   position absolute
   left 0
-  bottom 27px
   width 100%
   border-radius 5px
   overflow hidden
-  background-color rgba(25,25,25,.8)
 
 .danmaku-box
   padding 4px 8px
-  font-size 14px
-  line-height 20px
   user-select none
   cursor default
   color #fff

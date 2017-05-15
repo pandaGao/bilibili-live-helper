@@ -89,7 +89,9 @@
     },
     computed: {
       danmakuList () {
-        return this.$root.danmakuPool
+        return this.$root.danmakuPool.filter((danmaku) => {
+          return (danmaku.type === 'welcome' || danmaku.type === 'welcomeGuard' || danmaku.type === 'comment' || danmaku.type === 'gift' || danmaku.type === 'guardBuy' || danmaku.type === 'block' || danmaku.type === 'newFans')
+        })
       },
       user () {
         return this.$root.userService
@@ -113,7 +115,6 @@
       }
     },
     mounted () {
-      this.$electron.remote.getCurrentWindow().setIgnoreMouseEvents(false)
       this.$nextTick(() => {
         this.$refs.list.scrollTop = this.$refs.list.scrollHeight
       })
