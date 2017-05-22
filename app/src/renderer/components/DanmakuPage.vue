@@ -98,7 +98,7 @@
       },
       danmakuListStyle () {
         return {
-          backgroundColor: this.config.hideToolbar ? 'rgba(25,25,25,.4)' : 'rgba(25,25,25,.8)',
+          backgroundColor: `rgba(25, 25, 25, ${this.config.danmakuBackgroundOpacity / 100})`,
           bottom: this.config.hideToolbar ? 0 : '27px'
         }
       }
@@ -110,18 +110,21 @@
     },
     mounted () {
       this.updateDanmaku()
-      if (this.config.danmakuDisplayTime < 5) {
-        this.config.danmakuDisplayTime = 5
-      }
-      if (this.config.danmakuDisplayTime > 999) {
-        this.config.danmakuDisplayTime = 999
-      }
-      if (this.config.danmakuFontSize < 10) {
-        this.config.danmakuFontSize = 10
-      }
-      if (this.config.danmakuFontSize > 64) {
-        this.config.danmakuFontSize = 64
-      }
+      this.config.danmakuDisplayTime = this.config.danmakuDisplayTime > 999
+        ? 999
+        : this.config.danmakuDisplayTime < 5
+          ? 5
+          : this.config.danmakuDisplayTime
+      this.config.danmakuFontSize = this.config.danmakuFontSize > 64
+        ? 64
+        : this.config.danmakuFontSize < 10
+          ? 10
+          : this.config.danmakuFontSize
+      this.config.danmakuBackgroundOpacity = this.config.danmakuBackgroundOpacity > 100
+        ? 100
+        : this.config.danmakuBackgroundOpacity < 0
+          ? 0
+          : this.config.danmakuBackgroundOpacity
       this.$electron.remote.getCurrentWindow().setIgnoreMouseEvents(true)
       this.$electron.ipcRenderer.send('setHideToolbar', this.config.hideToolbar)
     },

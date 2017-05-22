@@ -6,7 +6,7 @@
  Bilibili直播弹幕姬 for Mac / Windows / Linux
 
 ## Download
-最新版本 v0.3.1 [点此前往下载](http://bilibili.danmaku.live)
+最新版本 v0.3.2 [点此前往下载](http://bilibili.danmaku.live)
 
 ## Features
 * 支持 MacOS Windows Linux
@@ -31,6 +31,11 @@
  * Linux用户在启动时需要加上`--enable-transparent-visuals` 和 `--disable-gpu` 参数以支持透明窗口
 
 ## Change Logs
+* 2017-05-22 - v0.3.2
+  * 添加弹幕视图背景透明度设置
+  * 优化弹幕连接方式，减少漏弹幕的情况
+  * 修复关注显示不正常问题
+  * 支持输入框内复制粘贴全选等操作
 * 2017-05-15 - v0.3.1
   * 增加弹幕视图游戏模式，防止任务栏误触，减淡背景色
   * 增加弹幕字号设置

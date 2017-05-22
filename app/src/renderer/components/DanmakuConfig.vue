@@ -53,7 +53,7 @@
         <checkbox v-model="config.useGiftEnd" label="礼物打包提示"></checkbox>
       </div>
       <div class="field">
-        <checkbox v-model="config.hideToolbar" label="游戏模式"></checkbox>
+        <checkbox v-model="config.hideToolbar" label="防误触模式"></checkbox>
       </div>
     </div>
     <div class="row">
@@ -64,6 +64,11 @@
     <div class="row">
       <div class="field">
         <numberinput v-model="config.danmakuDisplayTime" label="弹幕停留时间" unit="秒"></numberinput>
+      </div>
+    </div>
+    <div class="row">
+      <div class="field">
+        <numberinput v-model="config.danmakuBackgroundOpacity" label="弹幕背景透明度" unit="%"></numberinput>
       </div>
     </div>
   </div>

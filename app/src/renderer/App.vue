@@ -13,7 +13,7 @@
   import History from './components/HistoryPage'
   import Test from './components/TestPage'
 
-  import Live from 'bilibili-live/src/index.js'
+  import Live from 'bilibili-live'
   import UserDataStore from './utils/UserDataStore.js'
   import Statistic from './utils/Statistic.js'
   import os from 'os'
@@ -27,7 +27,7 @@
     },
     data () {
       return {
-        version: '0.3.1',
+        version: '0.3.2',
         needUpdate: false,
         win: null,
         currentPage: 'config',
@@ -50,7 +50,8 @@
           useGiftEnd: true,
           hideToolbar: false,
           danmakuFontSize: 14,
-          danmakuDisplayTime: 10
+          danmakuDisplayTime: 10,
+          danmakuBackgroundOpacity: 80
         },
         danmakuPool: [],
         roomFansPool: [],
@@ -72,7 +73,7 @@
         this.danmakuPool = []
         this.startDanmakuService().then(() => {
           if (this.userService) {
-            this.userService.setCurrentRoom(this.danmakuService.getRoomInfo().id)
+            this.userService.setCurrentRoom(this.danmakuService.getInfo().id)
           }
         })
         this.saveConfig()
@@ -153,7 +154,7 @@
             //     body: msg.comment
             //   })
             // }
-          }).on('giftEnd', (msg) => {
+          }).on('giftBundle', (msg) => {
             if (this.config.useGiftEnd) {
               msg.type = 'gift'
               this.addDanmaku(msg)

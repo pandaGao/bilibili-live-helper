@@ -2,7 +2,7 @@
 
 import electron from 'electron'
 
-const { app, BrowserWindow, dialog, ipcMain } = electron
+const { app, BrowserWindow, dialog, ipcMain, Menu } = electron
 
 let mainWindow,toolbarWindow,loginWindow
 
@@ -17,6 +17,24 @@ const toolbarURL = process.env.NODE_ENV === 'development'
 const loginURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:${require('../../../config').port}/login.html`
   : `file://${__dirname}/login.html`
+
+
+const template = [
+  {
+    label: '编辑',
+    submenu: [
+      {role: 'undo'},
+      {role: 'redo'},
+      {type: 'separator'},
+      {role: 'cut'},
+      {role: 'copy'},
+      {role: 'paste'},
+      {role: 'pasteandmatchstyle'},
+      {role: 'delete'},
+      {role: 'selectall'}
+    ]
+  }
+]
 
 function createMainWindow () {
   /**
@@ -110,11 +128,13 @@ function createMainWindow () {
     })
   })
 
-  // eslint-disable-next-line no-console
   console.log('mainWindow opened')
 }
 
-app.on('ready', createMainWindow)
+app.on('ready', () => {
+  createMainWindow()
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template))
+})
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
