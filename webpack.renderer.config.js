@@ -14,9 +14,9 @@ let rendererConfig = {
   devtool: '#eval-source-map',
   devServer: { overlay: true },
   entry: {
-    renderer: path.join(__dirname, 'app/src/renderer/main.js'),
-    toolbar: path.join(__dirname, 'app/src/toolbar/main.js'),
-    login: path.join(__dirname, 'app/src/login/main.js')
+    app: path.join(__dirname, 'app/src/renderer/app/entry.js'),
+    danmaku: path.join(__dirname, 'app/src/renderer/danmaku/entry.js'),
+    toolbar: path.join(__dirname, 'app/src/renderer/toolbar/entry.js')
   },
   externals: Object.keys(pkg.dependencies || {}),
   module: {
@@ -84,28 +84,28 @@ let rendererConfig = {
   plugins: [
     new ExtractTextPlugin('styles.css'),
     new HtmlWebpackPlugin({
-      filename: 'index.html',
-      template: './app/index.ejs',
+      filename: 'app.html',
+      template: './app/src/renderer/app/index.ejs',
       appModules: process.env.NODE_ENV !== 'production'
         ? path.resolve(__dirname, 'app/node_modules')
         : false,
-      chunks: ['renderer']
+      chunks: ['app']
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'danmaku.html',
+      template: './app/src/renderer/danmaku/index.ejs',
+      appModules: process.env.NODE_ENV !== 'production'
+        ? path.resolve(__dirname, 'app/node_modules')
+        : false,
+      chunks: ['danmaku']
     }),
     new HtmlWebpackPlugin({
       filename: 'toolbar.html',
-      template: './app/toolbar.ejs',
+      template: './app/src/renderer/toolbar/index.ejs',
       appModules: process.env.NODE_ENV !== 'production'
         ? path.resolve(__dirname, 'app/node_modules')
         : false,
       chunks: ['toolbar']
-    }),
-    new HtmlWebpackPlugin({
-      filename: 'login.html',
-      template: './app/login.ejs',
-      appModules: process.env.NODE_ENV !== 'production'
-        ? path.resolve(__dirname, 'app/node_modules')
-        : false,
-      chunks: ['login']
     }),
     new webpack.NoEmitOnErrorsPlugin()
   ],

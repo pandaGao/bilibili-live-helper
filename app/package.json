@@ -5,11 +5,13 @@
   "main": "./dist/main.js",
   "dependencies": {
     "babel-runtime": "^6.23.0",
-    "bilibili-live": "^0.7.1",
+    "bilibili-live": "^0.9.3",
+    "echarts": "^3.6.2",
+    "iview": "^2.0.0-rc.17",
     "lodash": "^4.17.4",
+    "simple-netease-cloud-music": "^0.1.8",
     "vue": "^2.1.10",
     "vue-electron": "^1.0.6",
-    "vue-resource": "^1.0.3",
     "vue-router": "^2.1.2",
     "vuex": "^2.1.1"
   },

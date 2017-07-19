@@ -30,7 +30,7 @@
             <span v-if="danmaku.user.guard == 3 && config.showUserGuard" class="guard-user" :class="userGuardLevel(danmaku.user.guard)">舰长</span>
             <span v-if="danmaku.user.isSVIP && config.showUserVIP" class="svip-user">爷</span>
             <span v-else-if="danmaku.user.isVIP && config.showUserVIP" class="vip-user">爷</span>
-            <span v-if="danmaku.user.badge && config.showUserBadge" class="user-badge" :class="userBadgeLevelColor(danmaku.user.badge.level)">{{ danmaku.user.badge.title+danmaku.user.badge.level }}</span>
+            <span v-if="danmaku.user.badge && config.showUserBadge" class="user-badge" :class="userBadgeLevelColor(danmaku.user.badge.level)"><span class="user-badge-title">{{ danmaku.user.badge.title }}</span><span class="user-badge-level">{{ danmaku.user.badge.level }}</span></span>
             <span v-if="danmaku.user.level && config.showUserLevel" class="user-level" :class="userLevelColor(danmaku.user.level)">{{ "UL "+danmaku.user.level }}</span>
             <span class="user-name">{{ danmaku.user.name }}:</span>
             <span class="user-comment">{{ danmaku.comment }}</span>
@@ -253,18 +253,46 @@
   .user-level-6
     color #fc953a
   .user-badge
-    padding 1px 2px
+    border-width 1px
+    border-style solid
     border-radius 4px
+    overflow hidden
+    .user-badge-title
+      padding 0 4px
+    .user-badge-level
+      border-top-right-radius 3px
+      border-bottom-right-radius 3px
+      padding 0 3px
   .user-badge-level-1
     background-color #61decb
+    border-color #61decb
+    .user-badge-level
+      background-color #fff
+      color #61decb
   .user-badge-level-2
     background-color #5896de
+    border-color #5896de
+    .user-badge-level
+      background-color #fff
+      color #5896de
   .user-badge-level-3
     background-color #a068f1
+    border-color #a068f1
+    .user-badge-level
+      background-color #fff
+      color #a068f1
   .user-badge-level-4
     background-color #ff86b2
+    border-color #ff86b2
+    .user-badge-level
+      background-color #fff
+      color #ff86b2
   .user-badge-level-5
     background-color #f6be18
+    border-color #f6be18
+    .user-badge-level
+      background-color #fff
+      color #f6be18
   .guard-user
     padding 1px 2px
     border-radius 4px

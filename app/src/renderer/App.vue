@@ -51,8 +51,10 @@
           hideToolbar: false,
           danmakuFontSize: 14,
           danmakuDisplayTime: 10,
-          danmakuBackgroundOpacity: 80
+          danmakuBackgroundOpacity: 80,
+          useHttps: true
         },
+        lockWindowHeight: false,
         danmakuPool: [],
         roomFansPool: [],
         roomOnlineUser: '--',
@@ -69,11 +71,20 @@
         },
         deep: true
       },
+      'config.useHttps' () {
+        this.startDanmakuService().then(() => {
+          if (this.userService) {
+            this.userService.setCurrentRoom(this.danmakuService.getInfo().id)
+            this.userService.useHttps(this.config.useHttps)
+          }
+        })
+      },
       roomId (newVal) {
         this.danmakuPool = []
         this.startDanmakuService().then(() => {
           if (this.userService) {
             this.userService.setCurrentRoom(this.danmakuService.getInfo().id)
+            this.userService.useHttps(this.config.useHttps)
           }
         })
         this.saveConfig()
@@ -118,16 +129,17 @@
         })
       },
       startDanmakuService () {
-        if (this.danmakuService) {
-          this.danmakuService.removeAllListeners()
-          this.danmakuService.disconnect()
-          this.danmakuService = null
-          this.roomOnlineUser = '--'
-          this.roomFans = '--'
-        }
+        this.roomOnlineUser = '--'
+        this.roomFans = '--'
         return Live.initRoom({
-          roomId: this.roomId
+          roomId: this.roomId,
+          useHttps: this.config.useHttps
         }).then(room => {
+          if (this.danmakuService) {
+            this.danmakuService.removeAllListeners()
+            this.danmakuService.terminate()
+            this.danmakuService = null
+          }
           room.on('data', (msg) => {
             if (msg.type == 'gift') {
               if (!this.config.useGiftEnd) {
@@ -159,6 +171,10 @@
               msg.type = 'gift'
               this.addDanmaku(msg)
             }
+          }).on('close', (msg) => {
+            console.log('close')
+          }).on('error', (msg) => {
+            console.log('error')
           })
           this.danmakuService = room
         })
@@ -177,12 +193,22 @@
       resetWindow (x, y) {
         let workArea = this.$electron.screen.getPrimaryDisplay().workArea
         let bound = this.win.getBounds()
-        this.win.setBounds({
-          x: x,
-          y: workArea.y,
-          width: 320,
-          height: y - workArea.y
-        })
+        console.log(bound)
+        if (this.lockWindowHeight) {
+          this.win.setBounds({
+            x: x,
+            y: y - bound.height,
+            width: 320,
+            height: bound.height
+          })
+        } else {
+          this.win.setBounds({
+            x: x,
+            y: workArea.y,
+            width: 320,
+            height: y - workArea.y
+          })
+        }
       },
       loginUser (cookie) {
         this.cookie = cookie

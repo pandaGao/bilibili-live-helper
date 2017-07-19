@@ -72,7 +72,7 @@ export default {
       this.$root.currentPage = 'danmaku'
     },
     openMyRoom () {
-      this.$electron.shell.openExternal('http://live.bilibili.com/'+this.userRoom.id)
+      this.$electron.shell.openExternal('https://live.bilibili.com/'+this.userRoom.id)
     },
     logout () {
       this.$root.logoutUser()

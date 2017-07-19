@@ -71,6 +71,12 @@
         <numberinput v-model="config.danmakuBackgroundOpacity" label="弹幕背景透明度" unit="%"></numberinput>
       </div>
     </div>
+    <div class="title">弹幕姬设置</div>
+    <div class="row">
+      <div class="field">
+        <checkbox v-model="config.useHttps" label="使用https连接"></checkbox>
+      </div>
+    </div>
   </div>
 </template>
 

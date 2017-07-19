@@ -4,20 +4,19 @@ import electron from 'electron'
 
 const { app, BrowserWindow, dialog, ipcMain, Menu } = electron
 
-let mainWindow,toolbarWindow,loginWindow
+let mainWindow, toolbarWindow, danmakuWindow
 
-const winURL = process.env.NODE_ENV === 'development'
-  ? `http://localhost:${require('../../../config').port}`
-  : `file://${__dirname}/index.html`
+const mainURL = process.env.NODE_ENV === 'development'
+  ? `http://localhost:${require('../../../config').port}/app.html`
+  : `file://${__dirname}/app.html`
 
 const toolbarURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:${require('../../../config').port}/toolbar.html`
   : `file://${__dirname}/toolbar.html`
 
-const loginURL = process.env.NODE_ENV === 'development'
-  ? `http://localhost:${require('../../../config').port}/login.html`
-  : `file://${__dirname}/login.html`
-
+const danmakuURL = process.env.NODE_ENV === 'development'
+  ? `http://localhost:${require('../../../config').port}/danmaku.html`
+  : `file://${__dirname}/danmaku.html`
 
 const template = [
   {
@@ -37,81 +36,95 @@ const template = [
 ]
 
 function createMainWindow () {
-  /**
-   * Initial window options
-   */
-   const workArea = electron.screen.getPrimaryDisplay().workArea
+  const workArea = electron.screen.getPrimaryDisplay().workArea
 
-   toolbarWindow = new BrowserWindow({
-     height: 27,
-     width: 320,
-     x: workArea.x + workArea.width - 320,
-     y: workArea.y + workArea.height - 27,
-     transparent: true,
-     frame: false,
-     alwaysOnTop: true,
-     resizable: false,
-     hasShadow: false
-   })
-
-   toolbarWindow.loadURL(toolbarURL)
-
-   toolbarWindow.on('closed', () => {
-     toolbarWindow = null
-   })
-
-   toolbarWindow.on('move', () => {
-     let bound = toolbarWindow.getBounds()
-     mainWindow.webContents.send('move', bound.x, bound.y)
-   })
-
-   mainWindow = new BrowserWindow({
-     parent: toolbarWindow,
-     height: workArea.height - 27,
-     width: 320,
-     x: workArea.x + workArea.width - 320,
-     y: workArea.y,
-     transparent: true,
-     frame: false,
-     alwaysOnTop: true,
-     resizable: false,
-     movable: false,
-     hasShadow: false
-   })
-
-  mainWindow.loadURL(winURL)
-
-  mainWindow.on('closed', () => {
-    mainWindow = null
+  mainWindow = new BrowserWindow({
+    width: 1024,
+    height: 672,
+    resizable: false,
+    titleBarStyle: 'hidden-inset'
   })
 
-  ipcMain.on('changePage', (evt, page) => {
-    mainWindow.webContents.send('changePage', page)
+  mainWindow.loadURL(mainURL)
+
+  toolbarWindow = new BrowserWindow({
+    height: 56,
+    width: 320,
+    x: workArea.x + workArea.width - 320,
+    y: workArea.y + workArea.height - 56,
+    transparent: true,
+    frame: false,
+    alwaysOnTop: true,
+    resizable: false,
+    hasShadow: false
   })
 
-  ipcMain.on('openLogin', (evt) => {
-    if (loginWindow) return
-    loginWindow = new BrowserWindow({
-      parent: mainWindow,
-      width: 340,
-      height: 272,
-      useContentSize: true,
-      resizable: false
-    })
-    loginWindow.loadURL(loginURL)
-    loginWindow.on('close', () => {
-      loginWindow = null
-    })
+  toolbarWindow.loadURL(toolbarURL)
+
+  toolbarWindow.on('closed', () => {
+    toolbarWindow = null
   })
 
-  ipcMain.on('closeLogin', (evt, cookie) => {
-    loginWindow.close()
-    mainWindow.webContents.send('updateCookie', cookie)
+  toolbarWindow.on('move', () => {
+    let bound = toolbarWindow.getBounds()
+    danmakuWindow.webContents.send('move', bound.x, bound.y)
+  })
+
+  danmakuWindow = new BrowserWindow({
+    parent: toolbarWindow,
+    height: workArea.height - 56,
+    width: 320,
+    x: workArea.x + workArea.width - 320,
+    y: workArea.y,
+    transparent: true,
+    frame: false,
+    alwaysOnTop: true,
+    resizable: false,
+   hasShadow: false,
+   movable: false
+  })
+
+  danmakuWindow.setIgnoreMouseEvents(true)
+  danmakuWindow.loadURL(danmakuURL)
+
+  danmakuWindow.on('closed', () => {
+    danmakuWindow = null
   })
 
   ipcMain.on('setHideToolbar', (evt, hide) => {
     toolbarWindow.setAlwaysOnTop(!hide)
-    mainWindow.setAlwaysOnTop(true)
+    danmakuWindow.setAlwaysOnTop(true)
+  })
+
+  // mainWindow to danmakuWindow
+  ipcMain.on('sendConfig', (evt, config) => {
+    danmakuWindow.webContents.send('newConfig', config)
+  })
+
+  ipcMain.on('clearDanmaku', (evt) => {
+    danmakuWindow.webContents.send('clearDanmaku')
+  })
+
+  ipcMain.on('sendDanmaku', (evt, danmaku) => {
+    danmakuWindow.webContents.send('newDanmaku', danmaku)
+  })
+
+  ipcMain.on('setRoomOnline', (evt, number) => {
+    danmakuWindow.webContents.send('onlineNumber', number)
+  })
+
+  ipcMain.on('setRoomFans', (evt, number) => {
+    danmakuWindow.webContents.send('fansNumber', number)
+  })
+
+  // danmakuWindow to mainWindow
+  ipcMain.on('changePage', (evt, page) => {
+    mainWindow.focus()
+    mainWindow.webContents.send('changePage', page)
+  })
+
+  ipcMain.on('sendMessage', (evt, msg) => {
+    mainWindow.webContents.send('sendMessage', msg)
   })
 
   ipcMain.on('quitApp', (evt) => {
@@ -127,8 +140,6 @@ function createMainWindow () {
       }
     })
   })
-
-  console.log('mainWindow opened')
 }
 
 app.on('ready', () => {
