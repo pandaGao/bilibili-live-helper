@@ -1,6 +1,7 @@
 'use strict'
 
 import electron from 'electron'
+import _ from 'lodash'
 
 const { app, BrowserWindow, dialog, ipcMain, Menu } = electron
 
@@ -17,6 +18,8 @@ const toolbarURL = process.env.NODE_ENV === 'development'
 const danmakuURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:${require('../../../config').port}/danmaku.html`
   : `file://${__dirname}/danmaku.html`
+
+const MOVE_DELAY = 3e2
 
 const template = [
   {
@@ -35,6 +38,11 @@ const template = [
   }
 ]
 
+let moveEvent = _.debounce(() => {
+  let bound = toolbarWindow.getBounds()
+  danmakuWindow.webContents.send('move', bound.x, bound.y)
+}, MOVE_DELAY)
+
 function createMainWindow () {
   const workArea = electron.screen.getPrimaryDisplay().workArea
 
@@ -42,10 +50,15 @@ function createMainWindow () {
     width: 1024,
     height: 672,
     resizable: false,
-    titleBarStyle: 'hidden-inset'
+    fullscreenable: false,
+    frame: false
   })
 
   mainWindow.loadURL(mainURL)
+
+  mainWindow.on('closed', () => {
+    mainWindow = null
+  })
 
   toolbarWindow = new BrowserWindow({
     height: 56,
@@ -66,8 +79,7 @@ function createMainWindow () {
   })
 
   toolbarWindow.on('move', () => {
-    let bound = toolbarWindow.getBounds()
-    danmakuWindow.webContents.send('move', bound.x, bound.y)
+    moveEvent()
   })
 
   danmakuWindow = new BrowserWindow({
@@ -80,8 +92,8 @@ function createMainWindow () {
     frame: false,
     alwaysOnTop: true,
     resizable: false,
-   hasShadow: false,
-   movable: false
+    hasShadow: false,
+    movable: false
   })
 
   danmakuWindow.setIgnoreMouseEvents(true)
@@ -119,6 +131,9 @@ function createMainWindow () {
 
   // danmakuWindow to mainWindow
   ipcMain.on('changePage', (evt, page) => {
+    if (mainWindow.isMinimized()) {
+      mainWindow.restore()
+    }
     mainWindow.focus()
     mainWindow.webContents.send('changePage', page)
   })
@@ -148,13 +163,5 @@ app.on('ready', () => {
 })
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
-})
-
-app.on('activate', () => {
-  if (mainWindow === null) {
-    createMainWindow()
-  }
+  app.quit()
 })

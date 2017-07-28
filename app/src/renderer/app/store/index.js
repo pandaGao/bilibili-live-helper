@@ -104,6 +104,8 @@ if (userConfig) {
 export default new Vuex.Store({
   state: {
     version: '1.0.0',
+    needUpdate: false,
+    latestVersion: false,
     roomId,
     cookie,
     config,
@@ -142,6 +144,10 @@ export default new Vuex.Store({
     }
   },
   mutations: {
+    'CHECK_UPDATE' (state, payload) {
+      state.needUpdate = payload.needUpdate
+      state.latestVersion = payload.latestVersion
+    },
     'SET_ROOM_ID' (state, payload) {
       state.roomId = payload.roomId
     },
@@ -155,9 +161,9 @@ export default new Vuex.Store({
           danmakuMode: state.danmakuConfig.mode,
           danmakuColor: state.danmakuConfig.color
         })
-      }
-      if (state.danmakuService) {
-        state.userService.setCurrentRoom(state.danmakuService.getInfo().id)
+        if (state.danmakuService) {
+          state.userService.setCurrentRoom(state.danmakuService.getInfo().id)
+        }
       }
     },
     'SET_DANMAKU_SERVICE' (state, payload) {
@@ -307,6 +313,7 @@ export default new Vuex.Store({
         useWSS: state.config.useHttps
       }).then(room => {
         if (state.danmakuService) {
+          state.danmakuService.disconnect()
           state.danmakuService.removeAllListeners()
           if (state.lastDanmakuServiceRoomID != state.roomId) {
             commit('SET_ONLINE_NUMBER', {
@@ -323,17 +330,20 @@ export default new Vuex.Store({
           commit('SET_DANMAKU_SERVICE_STATUS', {
             status: 'open'
           })
+          console.log('open')
         }).on('close', () => {
           commit('SET_DANMAKU_SERVICE_STATUS', {
             status: 'error'
           })
+          console.log('close')
           restartService = setTimeout(() => {
             dispatch('START_DANMAKU_SERVICE')
           }, RECONNECT_DELAY)
-        }).on('error', () => {
+        }).on('error', (err) => {
           commit('SET_DANMAKU_SERVICE_STATUS', {
             status: 'error'
           })
+          console.log('error')
           restartService = setTimeout(() => {
             dispatch('START_DANMAKU_SERVICE')
           }, RECONNECT_DELAY)
@@ -361,11 +371,12 @@ export default new Vuex.Store({
             commit('SET_FANS_NUMBER', {
               number: msg.total
             })
-            msg.newFans.map((fan) => {
+            msg.newFans.map((fan, idx) => {
               commit('PUSH_DANMAKU_POOL', {
                 danmaku: {
                   type: 'newFans',
-                  user: fan
+                  user: fan,
+                  ts: new Date().getTime() + idx
                 }
               })
             })

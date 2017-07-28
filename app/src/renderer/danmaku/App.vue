@@ -3,8 +3,8 @@
     <div class="danmaku-list" ref="list" :style="danmakuListStyle">
       <transition-group name="danmaku">
         <div class="danmaku-box"
-          v-for="danmaku in danmakuList"
-          :key="danmaku"
+          v-for="(danmaku, idx) in danmakuList"
+          :key="danmaku.transCount"
           :style="danmakuBoxStyle">
           <div v-if="danmaku.type == 'connected'" class="msg-connected">弹幕服务器连接成功...</div>
           <div v-else-if="danmaku.type == 'error'" class="msg-error">连接发生错误，3秒后自动重连...</div>
@@ -55,6 +55,12 @@
           <div v-else-if="danmaku.type == 'test'" class="msg-test">
             <span class="test-content">{{ danmaku.content }}</span>
           </div>
+          <div v-else-if="danmaku.type == 'musicLog'" class="msg-music">
+            <span class="user-name">{{ danmaku.user.name }}</span>
+            <span v-if="danmaku.passed" class="music-success">点歌成功</span>
+            <span v-else class="music-failed">点歌失败</span>
+            <span v-if="danmaku.log" class="music-log">{{ danmaku.log }}</span>
+          </div>
           <div v-else>{{ danmaku }}</div>
         </div>
       </transition-group>
@@ -70,6 +76,7 @@
   export default {
     data () {
       return {
+        danmakuCount: 0,
         danmakuList: [],
         onlineNumber: '--',
         fansNumber: '--',
@@ -145,7 +152,7 @@
       })
       this.$electron.ipcRenderer.on('newDanmaku', (evt, danmaku) => {
         danmaku.filter(msg => {
-          return msg.type == 'test' || this.config[msg.type+'Message']
+          return msg.type == 'test' || msg.type == 'musicLog' || this.config[msg.type+'Message']
         }).map(msg => {
           this.addDanmaku(msg)
         })
@@ -162,6 +169,7 @@
     },
     methods: {
       addDanmaku (danmaku) {
+        danmaku.transCount = this.danmakuCount++
         this.danmakuList.push(danmaku)
         setTimeout(() => {
           this.removeDanmaku()
@@ -384,4 +392,8 @@
       height 32px
     .user-name
       color #ff8f34
+  .music-success
+    color #19be6b
+  .music-failed
+    color #ed3f14
 </style>

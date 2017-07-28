@@ -10,6 +10,12 @@ import Statistic from './pages/statistic/Index.vue'
 import Help from './pages/help/Index.vue'
 import About from './pages/help/About.vue'
 import Privacy from './pages/help/Privacy.vue'
+import GameAnchor from './pages/help/GameAnchor.vue'
+import SingerAnchor from './pages/help/SingerAnchor.vue'
+// import OtakuAnchor from './pages/help/OtakuAnchor.vue'
+import WindowsUser from './pages/help/WindowsUser.vue'
+// import MacUser from './pages/help/MacUser.vue'
+import LinuxUser from './pages/help/LinuxUser.vue'
 
 Vue.use(VueRouter)
 
@@ -64,6 +70,30 @@ export default new VueRouter({
         {
           path: 'privacy',
           component: Privacy
+        },
+        {
+          path: 'game',
+          component: GameAnchor
+        },
+        {
+          path: 'singer',
+          component: SingerAnchor
+        },
+        // {
+        //   path: 'otaku',
+        //   component: OtakuAnchor
+        // },
+        {
+          path: 'windows',
+          component: WindowsUser
+        },
+        // {
+        //   path: 'mac',
+        //   component: MacUser
+        // },
+        {
+          path: 'linux',
+          component: LinuxUser
         }
       ]
     },

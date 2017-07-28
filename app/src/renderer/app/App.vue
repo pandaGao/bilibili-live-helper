@@ -2,6 +2,10 @@
   <Row type="flex" class="app-container">
     <Col span="2">
       <Menu theme="dark" :active-name="currentPage" width="auto" class="icon-menu">
+        <div class="toolbar">
+          <Button icon="close-round" type="text" size="small" @click="quitApp"></Button>
+          <Button icon="minus-round" type="text" size="small" @click="minimizeWindow"></Button>
+        </div>
         <div class="icon-menu-group">
           <Menu-item name="/config" @click.native="to('/config')">
             <Icon type="gear-a" :size="25"></Icon>
@@ -15,8 +19,11 @@
           <Menu-item name="/statistic" @click.native="to('/statistic')">
             <Icon type="podium" :size="iconSize"></Icon>
           </Menu-item>
-          <Menu-item name="6" @click.native="to('/help')">
-            <Icon type="help-circled" :size="iconSize"></Icon>
+          <Menu-item name="/help" @click.native="to('/help')">
+            <Badge v-if="needUpdate" dot>
+              <Icon type="help-circled" :size="iconSize"></Icon>
+            </Badge>
+            <Icon v-else type="help-circled" :size="iconSize"></Icon>
           </Menu-item>
         </div>
       </Menu>
@@ -28,6 +35,9 @@
 </template>
 
 <script>
+import os from 'os'
+import Statistic from '../utils/Statistic.js'
+
 export default {
   data () {
     return {
@@ -56,6 +66,12 @@ export default {
     },
     danmakuService () {
       return this.$store.state.danmakuService
+    },
+    version () {
+      return this.$store.state.version
+    },
+    needUpdate () {
+      return this.$store.state.needUpdate
     }
   },
   watch: {
@@ -88,6 +104,7 @@ export default {
     this.$electron.ipcRenderer.on('sendMessage', (evt, msg) => {
       this.sendMessage(msg)
     })
+    this.checkUpdate()
   },
   methods: {
     to (path) {
@@ -130,8 +147,8 @@ export default {
         let comment = msg.comment+''
         if (comment.startsWith('#点歌 ')) {
           let music = comment.slice(4).toLowerCase().trim()
-          let passed = this.validateMusicDanmaku(msg, music)
-          if (passed) {
+          let validate = this.validateMusicDanmaku(msg, music)
+          if (validate.passed) {
             this.$store.commit('ADD_MUSIC_LIST', {
               music: {
                 name: music,
@@ -154,6 +171,15 @@ export default {
               this.$root.startPlayMusic()
             }
           }
+          this.$store.commit('PUSH_DANMAKU_POOL', {
+            danmaku: {
+              type: 'musicLog',
+              user: msg.user,
+              passed: validate.passed,
+              log: validate.msg,
+              ts: new Date().getTime()
+            }
+          })
         }
       }
     },
@@ -168,7 +194,10 @@ export default {
             user: msg.user.name,
             msg: '用户等级未达到要求'
           })
-          return false
+          return {
+            passed: false,
+            msg: '用户等级未达到要求'
+          }
         }
       }
       // 粉丝勋章
@@ -181,7 +210,10 @@ export default {
             user: msg.user.name,
             msg: '粉丝勋章等级未达到要求'
           })
-          return false
+          return {
+            passed: false,
+            msg: '粉丝勋章等级未达到要求'
+          }
         }
       }
       // 已在点歌列表
@@ -194,7 +226,10 @@ export default {
           user: msg.user.name,
           msg: '歌曲已在点歌列表'
         })
-        return false
+        return {
+          passed: false,
+          msg: '歌曲已在点歌列表'
+        }
       }
       // 已在屏蔽列表
       passed = this.$store.state.blockList.every(m => {
@@ -206,7 +241,10 @@ export default {
           user: msg.user.name,
           msg: '歌曲已在屏蔽列表'
         })
-        return false
+        return {
+          passed: false,
+          msg: '歌曲已在屏蔽列表'
+        }
       }
       // 用户冷却中
       passed = !this.$store.state.userCDMap.has(msg.user.id) || this.$store.state.userCDMap.get(msg.user.id) < new Date()
@@ -216,7 +254,10 @@ export default {
           user: msg.user.name,
           msg: '用户还在点歌冷却时间中'
         })
-        return false
+        return {
+          passed: false,
+          msg: '用户还在点歌冷却时间中'
+        }
       }
       // 歌曲冷却中
       passed = !this.$store.state.musicCDMap.has(music) || this.$store.state.musicCDMap.get(music) < new Date()
@@ -226,14 +267,20 @@ export default {
           user: msg.user.name,
           msg: '歌曲还在冷却时间中'
         })
-        return false
+        return {
+          passed: false,
+          msg: '歌曲还在冷却时间中'
+        }
       }
       this.addMusicLog({
         status: true,
         user: msg.user.name,
         msg: music
       })
-      return true
+      return {
+        passed: true,
+        msg: ''
+      }
     },
     addMusicLog (log) {
       this.$store.commit('ADD_MUSIC_LOG', {
@@ -251,6 +298,22 @@ export default {
         return
       }
       this.userService.asyncSendMessage(msg)
+    },
+    checkUpdate() {
+      Statistic.checkUpdate(this.version, os.platform()).then(res => {
+        let data = res.json().then(json => {
+          this.$store.commit('CHECK_UPDATE', {
+            needUpdate: json.needUpdate,
+            latestVersion: json.latestVersion
+          })
+        })
+      })
+    },
+    minimizeWindow () {
+      this.$electron.remote.getCurrentWindow().minimize()
+    },
+    quitApp () {
+      this.$electron.ipcRenderer.send('quitApp')
     }
   }
 }
@@ -259,9 +322,14 @@ export default {
 <style lang="stylus" scoped>
 .app-container
   min-height 100vh
+  overflow hidden
+.toolbar
+  -webkit-app-region no-drag
+  padding-left 4px
+  margin-bottom 10px
 .icon-menu
+  padding-top 4px
   height 100%
-  padding-top 50px
   -webkit-user-select none
   -webkit-app-region drag
 .icon-menu-group

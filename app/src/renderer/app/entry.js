@@ -63,6 +63,10 @@ new Vue({
         this.musicLyricsIdx = this.musicLyrics.findIndex(this.musicPlayer.currentTime*1000)
       }
     })
+    this.musicPlayer.addEventListener('error', (e) => {
+      this.$Message.warning(`播放出错 错误代码: ${e.target.error.code}`)
+      this.nextMusic()
+    })
   },
   methods: {
     getMusicURL () {

@@ -3,7 +3,7 @@
     <Row :gutter="8" class="tile-row">
       <Col class="tile-col" span="12">
         <Card class="tile-card">
-          <p slot="title">点歌版</p>
+          <p slot="title">点歌板</p>
           <Tabs value="config">
             <Tab-pane label="设置" name="config">
               <Form label-position="left" :label-width="96">
@@ -24,7 +24,7 @@
                     <Radio :label="0">无</Radio>
                     <Radio :label="1">用户等级</Radio>
                     <Tooltip content="选择此项时请使用短位ID开启弹幕姬" placement="top">
-                      <Radio :label="2">用户勋章</Radio>
+                      <Radio :label="2">粉丝勋章</Radio>
                     </Tooltip>
                   </Radio-group>
                 </Form-item>
@@ -503,7 +503,8 @@ export default {
   display flex
   flex-direction column
   padding 10px
-  height 100%
+  height 100vh
+  overflow hidden
 .tile-row
   flex 1
 .tile-col
@@ -521,7 +522,7 @@ export default {
 .block-input
   margin-bottom 8px
 .music-log-container
-  height 240px
+  height 236px
   overflow-y scroll
   &::-webkit-scrollbar
     width 4px

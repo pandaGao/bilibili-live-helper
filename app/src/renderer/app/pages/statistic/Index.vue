@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import echarts from 'echarts'
+import * as echarts from 'echarts/dist/echarts.common.min.js'
 
 export default {
   data () {
@@ -57,7 +57,7 @@ export default {
   },
   computed: {
     onlinePool () {
-      return this.$store.state.onlinePool.map(msg => {
+      return this.$store.state.onlinePool.filter((i, idx) => !(idx%3)).map(msg => {
         return {
           name: msg.ts,
           value: [msg.ts, msg.number]
@@ -133,85 +133,90 @@ export default {
     }
   },
   mounted () {
-    this.chart = echarts.init(this.$refs.chart)
-    this.chart.setOption({
-      title: {
-        text: '房间人气趋势图',
-        top: 0,
-        left: 16
-      },
-      grid: {
-        left: '0%',
-        right: '2%',
-        bottom: '0%',
-        top: '10%',
-        containLabel: true
-      },
-      tooltip: {
-        trigger: 'axis',
-        formatter: (params) => {
-          let date = new Date(params[0].value[0])
-          let time = (date.getHours() > 9 ? date.getHours() : '0'+date.getHours())
-          time += ':' + (date.getMinutes() > 9 ? date.getMinutes() : '0'+date.getMinutes())
-          time += ':' + (date.getSeconds() > 9 ? date.getSeconds() : '0'+date.getSeconds())
-          return `${time}<br/>人气: ${params[0].value[1]}`
-        }
-      },
-      xAxis: {
-        type: 'time',
-        axisLine: {
-          show: false
-        },
-        axisTick: {
-          show: false
-        },
-        axisLabel: {
-          textStyle: {
-            color: '#999'
-          }
-        },
-        splitNumber: 10,
-        splitLine: {
-          lineStyle: {
-            type: 'dashed'
-          }
-        },
-      },
-      yAxis: {
-        type: 'value',
-        axisLine: {
-          show: false
-        },
-        axisTick: {
-          show: false
-        },
-        axisLabel: {
-          textStyle: {
-            color: '#999'
-          }
-        },
-        splitLine: {
-          lineStyle: {
-            type: 'dashed'
-          }
-        },
-      },
-      series: [
-        {
-          name: 'online number',
-          type: 'line',
-          areaStyle: {normal: {}},
-          smooth: true,
-          showSymbol: false,
-          data: this.onlinePool
-        }
-      ],
-      color: ['#2d8cf0']
+    this.$nextTick(() => {
+      this.initChart()
     })
   },
   methods: {
     giftImage (id) {
       return `http://static.hdslb.com/live-static/live-room/images/gift-section/gift-${id}.png`
+    },
+    initChart () {
+      this.chart = echarts.init(this.$refs.chart)
+      this.chart.setOption({
+        title: {
+          text: '房间人气趋势图',
+          top: 0,
+          left: 16
+        },
+        grid: {
+          left: '0%',
+          right: '2%',
+          bottom: '0%',
+          top: '10%',
+          containLabel: true
+        },
+        tooltip: {
+          trigger: 'axis',
+          formatter: (params) => {
+            let date = new Date(params[0].value[0])
+            let time = (date.getHours() > 9 ? date.getHours() : '0'+date.getHours())
+            time += ':' + (date.getMinutes() > 9 ? date.getMinutes() : '0'+date.getMinutes())
+            time += ':' + (date.getSeconds() > 9 ? date.getSeconds() : '0'+date.getSeconds())
+            return `${time}<br/>人气: ${params[0].value[1]}`
+          }
+        },
+        xAxis: {
+          type: 'time',
+          axisLine: {
+            show: false
+          },
+          axisTick: {
+            show: false
+          },
+          axisLabel: {
+            textStyle: {
+              color: '#999'
+            }
+          },
+          splitNumber: 10,
+          splitLine: {
+            lineStyle: {
+              type: 'dashed'
+            }
+          },
+        },
+        yAxis: {
+          type: 'value',
+          axisLine: {
+            show: false
+          },
+          axisTick: {
+            show: false
+          },
+          axisLabel: {
+            textStyle: {
+              color: '#999'
+            }
+          },
+          splitLine: {
+            lineStyle: {
+              type: 'dashed'
+            }
+          },
+        },
+        series: [
+          {
+            name: 'online number',
+            type: 'line',
+            areaStyle: {normal: {}},
+            smooth: true,
+            showSymbol: false,
+            data: this.onlinePool
+          }
+        ],
+        color: ['#2d8cf0']
+      })
     }
   }
 }

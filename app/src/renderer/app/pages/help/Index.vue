@@ -7,6 +7,12 @@
             <div class="menu-group">
               <Menu-item name="/about" @click.native="to('/help/about')">关于</Menu-item>
               <Menu-item name="/privacy" @click.native="to('/help/privacy')">隐私声明</Menu-item>
+              <Menu-item name="/game" @click.native="to('/help/game')">游戏主播</Menu-item>
+              <Menu-item name="/singer" @click.native="to('/help/singer')">唱见主播</Menu-item>
+              <!-- <Menu-item name="/otaku" @click.native="to('/help/otaku')">咸鱼主播</Menu-item> -->
+              <Menu-item name="/windows" @click.native="to('/help/windows')">Windows用户</Menu-item>
+              <!-- <Menu-item name="/mac" @click.native="to('/help/mac')">Mac用户</Menu-item> -->
+              <Menu-item name="/linux" @click.native="to('/help/linux')">Linux用户</Menu-item>
             </div>
           </Menu>
         </Card>
@@ -47,6 +53,8 @@ export default {
   flex-direction column
   padding 10px
   height 100%
+  .ivu-menu-item
+    padding-right 0
 .tile-row
   flex 1
 .tile-col

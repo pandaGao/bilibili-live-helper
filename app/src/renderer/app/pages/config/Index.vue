@@ -1,9 +1,9 @@
 <template>
   <div class="config-container">
     <Card class="tile-card">
-      <Spin v-if="!userService&&loadingUserInfo" size="large">登录中...</Spin>
-      <Button v-if="!userService&&!loadingUserInfo" type="info" @click="openLoginModal">点此登录</Button>
-      <Button v-if="!userService&&!loadingUserInfo" type="text" icon="ios-information-outline">隐私说明</Button>
+      <Spin class="not-login" v-if="!userService&&loadingUserInfo" size="large">登录中...</Spin>
+      <Button class="not-login" v-if="!userService&&!loadingUserInfo" type="info" @click="openLoginModal">点此登录</Button>
+      <Button class="not-login" v-if="!userService&&!loadingUserInfo" type="text" icon="ios-information-outline" @click="to('/help/privacy')">隐私说明</Button>
       <Modal
         v-model="showLoginModal"
         title="登录Bilibili"
@@ -179,6 +179,9 @@ export default {
   height 100%
 .tile-card
   margin-bottom 8px
+  height 108px
+  .not-login
+    margin-top 24px
 .tile-view
   flex 1
 .webview

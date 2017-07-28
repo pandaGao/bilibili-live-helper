@@ -6,7 +6,7 @@
           <p slot="title">基本设置</p>
           <Row class="config-row">
             <Col span="24">
-              <Input v-model="roomId" placeholder="支持短位ID">
+              <Input v-model="roomId" placeholder="支持短位ID" @on-enter="startDanmakuService">
                 <span slot="prepend">直播间ID</span>
               </Input>
             </Col>
@@ -309,7 +309,8 @@ export default {
     sendTestDanmaku () {
       this.$electron.ipcRenderer.send('sendDanmaku', [{
         type: 'test',
-        content: '弹幕测试'
+        content: '弹幕测试',
+        ts: new Date().getTime()
       }])
     },
     pitchTip (val) {

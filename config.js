@@ -15,7 +15,7 @@ let config = {
   building: {
     arch: 'x64',
     asar: true,
-    buildVersion: '0.3.2',
+    buildVersion: '1.0.0',
     dir: path.join(__dirname, 'app'),
     icon: path.join(__dirname, 'app/icons/icon'),
     ignore: /\b(src|index\.ejs|icons)\b/,
