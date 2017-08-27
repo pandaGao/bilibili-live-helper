@@ -15,11 +15,11 @@
       </Modal>
       <Row v-if="userService" type="flex" align="middle">
         <Col span="20">
-          <div class="user-info">
+          <div class="user-info" v-if="userInfo">
             <strong>{{userInfo.name}}</strong>
-            <span class="uid">UID {{userInfo.id}}</span>
+            <span v-if="userInfo.id" class="uid">UID {{userInfo.id}}</span>
             <span v-if="userRoom.id" class="uid">直播间 {{userRoom.id}}</span>
-            <div>
+            <div v-if="userInfo && userRoom">
               <div class="user-progress">
                 <span class="title">UL.{{userInfo.level}}</span>
                 <Progress class="progress" :percent="ulProgress" :stroke-width="6"></Progress>
@@ -29,7 +29,6 @@
                 <Progress class="progress" :percent="upProgress" :stroke-width="6"></Progress>
               </div>
             </div>
-            <Button type="ghost" size="small" @click="updateUserInfo" :loading="updatinguserInfo">刷新个人信息</Button>
             <Button type="ghost" size="small" @click="openMyRoomInBrowser">浏览器打开直播间</Button>
             <Button type="ghost" size="small" @click="logoutUser">登出</Button>
           </div>
@@ -49,8 +48,8 @@
 </template>
 
 <script>
-import Live from 'bilibili-live'
-import Statistic from '../../../utils/Statistic.js'
+import { Room, User, API } from 'bilibili-live'
+
 import os from 'os'
 
 export default {
@@ -58,10 +57,7 @@ export default {
     return {
       showLoginModal: false,
       src: 'http://passport.bilibili.com/ajax/miniLogin/minilogin',
-      loadingUserInfo: false,
-      updatinguserInfo: false,
-      userInfo: {},
-      userRoom: {}
+      loadingUserInfo: false
     }
   },
   computed: {
@@ -77,6 +73,12 @@ export default {
     userService () {
       return this.$store.state.userService
     },
+    userInfo () {
+      return this.$store.state.userInfo
+    },
+    userRoom () {
+      return this.$store.state.userRoom
+    },
     ulProgress () {
       return Math.floor(this.userInfo.current / this.userInfo.next * 100)
     },
@@ -85,25 +87,22 @@ export default {
     }
   },
   watch: {
-    cookie (val) {
-      if (val) {
+    cookie(val) {
+      if (!val) {
+        this.loadingUserInfo = false
+      } else {
         this.loginUser()
       }
     },
     userService (val) {
-      if (this.userService) {
-        this.userInfo = this.userService.getUserInfo()
-        this.userRoom = this.userService.getUserRoom()
+      if (val) {
+        this.loadingUserInfo = false
       }
     }
   },
   mounted () {
     if (this.cookie && !this.userService) {
       this.loginUser()
-    }
-    if (this.userService) {
-      this.userInfo = this.userService.getUserInfo()
-      this.userRoom = this.userService.getUserRoom()
     }
   },
   methods: {
@@ -132,16 +131,8 @@ export default {
     },
     loginUser () {
       this.loadingUserInfo = true
-      Live.initUser({
-        cookie: this.cookie
-      }).then(user => {
-        this.loadingUserInfo = false
-        if (!user) return
-        this.$store.commit({
-          type: 'SET_USER_SERVICE',
-          userService: user
-        })
-        Statistic.userLogin(this.version, os.platform(), user.getUserInfo().id, user.getUserRoom().id)
+      this.$store.dispatch({
+        type: 'START_USER_SERVICE'
       })
     },
     logoutUser () {
@@ -152,16 +143,6 @@ export default {
       this.$store.commit({
         type: 'SET_USER_SERVICE',
         userService: null
-      })
-    },
-    updateUserInfo () {
-      this.updatinguserInfo = true
-      this.userService.getInfo().then(() => {
-        this.updatinguserInfo = false
-        this.userInfo = this.userService.getUserInfo()
-        this.userRoom = this.userService.getUserRoom()
-      }, () => {
-        this.updatinguserInfo = false
       })
     },
     openMyRoomInBrowser () {

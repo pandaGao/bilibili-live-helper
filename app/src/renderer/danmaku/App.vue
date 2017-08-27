@@ -41,7 +41,7 @@
           <div v-else-if="danmaku.type == 'guardBuy'" class="msg-guard-buy">
             <span class="user-name">{{ danmaku.user.name }}</span>
             <span class="buy-msg">购买</span>
-            <span class="guard-user" :class="userGuardLevel(danmaku.level)" :style="guardStyle"></span>
+            <span class="guard-user-gift" :class="userGuardLevel(danmaku.level)" :style="guardStyle"></span>
             <span class="buy-count">{{ `× ${danmaku.count}` }}</span>
           </div>
           <div v-else-if="danmaku.type == 'block'" class="msg-block">
@@ -57,9 +57,14 @@
           </div>
           <div v-else-if="danmaku.type == 'musicLog'" class="msg-music">
             <span class="user-name">{{ danmaku.user.name }}</span>
-            <span v-if="danmaku.passed" class="music-success">点歌成功</span>
-            <span v-else class="music-failed">点歌失败</span>
+            <span v-if="danmaku.passed" class="success">点歌成功</span>
+            <span v-else class="failed">点歌失败</span>
             <span v-if="danmaku.log" class="music-log">{{ danmaku.log }}</span>
+          </div>
+          <div v-else-if="danmaku.type == 'sendLog'" class="msg-send">
+            <span v-if="danmaku.success" class="success">弹幕发送成功</span>
+            <span v-else class="failed">弹幕发送失败</span>
+            <span v-if="danmaku.msg" class="send-log">{{ danmaku.msg }}</span>
           </div>
           <div v-else>{{ danmaku }}</div>
         </div>
@@ -152,7 +157,7 @@
       })
       this.$electron.ipcRenderer.on('newDanmaku', (evt, danmaku) => {
         danmaku.filter(msg => {
-          return msg.type == 'test' || msg.type == 'musicLog' || this.config[msg.type+'Message']
+          return msg.type == 'test' || msg.type == 'musicLog' || msg.type == 'sendLog' || this.config[msg.type+'Message']
         }).map(msg => {
           this.addDanmaku(msg)
         })
@@ -387,13 +392,21 @@
     background-position 50% 0
   .guard-user-3
     background-position 0% 0
+  .guard-user-gift
+    display inline-block
+    width 32px
+    height 32px
+    vertical-align bottom
+    background-image url(http://static.hdslb.com/live-static/live-room/images/guard/icon-guard-big.png)
+    background-size auto 32px
   .msg-gift
     .gift-img > img
       height 32px
     .user-name
       color #ff8f34
-  .music-success
+  .success
     color #19be6b
-  .music-failed
+  .failed
     color #ed3f14
+
 </style>

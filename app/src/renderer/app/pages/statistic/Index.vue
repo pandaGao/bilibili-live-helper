@@ -68,9 +68,7 @@ export default {
       return this.$store.state.commentPool.length
     },
     fansCount () {
-      return this.$store.state.fansPool.reduce((total, msg) => {
-        return total + msg.newFans.length
-      }, 0)
+      return this.$store.state.fansPool.length
     },
     giftCount () {
       return this.$store.state.giftPool.reduce((total, msg) => {

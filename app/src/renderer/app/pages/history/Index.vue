@@ -140,7 +140,7 @@
               <div v-else-if="danmaku.type == 'guardBuy'" class="msg-guard-buy">
                 <span class="user-name">{{ danmaku.user.name }}</span>
                 <span class="buy-msg">购买</span>
-                <span class="guard-user" :class="userGuardLevel(danmaku.level)"></span>
+                <span class="guard-user-gift" :class="userGuardLevel(danmaku.level)"></span>
                 <span class="buy-count">{{ `× ${danmaku.count}` }}</span>
               </div>
               <div v-else-if="danmaku.type == 'block'" class="msg-block">
@@ -271,31 +271,32 @@ export default {
         this.$Message.warning('请先登录')
         return
       }
-      this.userService.sendMessage(this.danmakuContent).then(res => {
-        let msg = JSON.parse(res)
-        if (msg.code == 0) {
-          if (msg.msg) {
-            this.$Message.warning(msg.msg)
-          } else {
-            this.$Message.success('弹幕发送成功')
-            this.danmakuContent = ''
-          }
-        } else {
-          this.$Message.warning(msg.msg)
-        }
-      }, res => {
-        this.$Message.error('网络错误')
-      })
+      this.userService.sendMessage(this.danmakuContent)
+      this.danmakuContent = ''
+      // this.userService.sendMessage(this.danmakuContent).then(res => {
+      //   let msg = JSON.parse(res)
+      //   if (msg.code == 0) {
+      //     if (msg.msg) {
+      //       this.$Message.warning(msg.msg)
+      //     } else {
+      //       this.$Message.success('弹幕发送成功')
+      //       this.danmakuContent = ''
+      //     }
+      //   } else {
+      //     this.$Message.warning(msg.msg)
+      //   }
+      // }, res => {
+      //   this.$Message.error('网络错误')
+      // })
     },
     blockUser (uid) {
       if (!this.userService) {
         this.$Message.warning('请先登录')
         return
       }
-      this.userService.blockUser(uid, 720).then(res => {
-        let data = JSON.parse(res)
-        if (data.msg) {
-          this.$Message.error(data.msg)
+      this.userService.api.blockUser(uid, 720).then(res => {
+        if (res.msg) {
+          this.$Message.error(res.msg)
         } else {
           this.$Message.success('成功禁言该用户')
         }
@@ -306,10 +307,9 @@ export default {
         this.$Message.warning('请先登录')
         return
       }
-      this.userService.addAdmin(uid).then(res => {
-        let data = JSON.parse(res)
-        if (data.msg) {
-          this.$Message.error(data.msg)
+      this.userService.api.setAdmin(uid).then(res => {
+        if (res.msg) {
+          this.$Message.error(res.msg)
         } else {
           this.$Message.success('成功任命管理员')
         }
@@ -476,6 +476,13 @@ export default {
     background-position 50% 0
   .guard-user-3
     background-position 0% 0
+  .guard-user-gift
+    display inline-block
+    width 32px
+    height 32px
+    vertical-align bottom
+    background-image url(http://static.hdslb.com/live-static/live-room/images/guard/icon-guard-big.png)
+    background-size auto 32px
   .user-actions
     position absolute
     display inline-block
