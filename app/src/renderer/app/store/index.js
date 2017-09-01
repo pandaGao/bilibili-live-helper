@@ -1,7 +1,9 @@
+import os from 'os'
 import Vue from 'vue'
 import Vuex from 'vuex'
 import UserDataStore from '../../utils/UserDataStore.js'
-import Live from 'bilibili-live'
+import Statistic from '../../utils/Statistic.js'
+import { Room, User, API } from 'bilibili-live'
 
 Vue.use(Vuex)
 
@@ -103,7 +105,7 @@ if (userConfig) {
 
 export default new Vuex.Store({
   state: {
-    version: '1.0.0',
+    version: '1.0.1',
     needUpdate: false,
     latestVersion: false,
     roomId,
@@ -117,6 +119,9 @@ export default new Vuex.Store({
     lastDanmakuServiceRoomID: '',
     onlineNumber: '--',
     fansNumber: '--',
+    roomInfo: null,
+    userInfo: null,
+    userRoom: null,
     danmakuPool: [],
     commentPool: [],
     giftPool: [],
@@ -128,7 +133,8 @@ export default new Vuex.Store({
     finishMusicList: [],
     musicLog: [],
     musicCDMap: new Map(),
-    userCDMap: new Map()
+    userCDMap: new Map(),
+    areaList: []
   },
   getters: {
     localData (state) {
@@ -155,16 +161,26 @@ export default new Vuex.Store({
       state.lastDanmakuServiceRoomID = state.roomId
     },
     'SET_USER_SERVICE' (state, payload) {
-      state.userService = payload.userService
-      if (state.userService) {
-        state.userService.setDanmakuConfig({
+      if (payload.userService) {
+        payload.userService.setDanmakuConfig({
           danmakuMode: state.danmakuConfig.mode,
           danmakuColor: state.danmakuConfig.color
         })
         if (state.danmakuService) {
-          state.userService.setCurrentRoom(state.danmakuService.getInfo().id)
+          payload.userService.setRoomId(state.danmakuService.roomId)
+        }
+      } else {
+        if (state.userService) {
+          state.userService.disconnect()
         }
       }
+      state.userService = payload.userService
+    },
+    'SET_USER_INFO' (state, payload) {
+      state.userInfo = payload.userInfo
+    },
+    'SET_USER_ROOM' (state, payload) {
+      state.userRoom = payload.userRoom
     },
     'SET_DANMAKU_SERVICE' (state, payload) {
       state.danmakuService = payload.danmakuService
@@ -208,12 +224,16 @@ export default new Vuex.Store({
     'SET_FANS_NUMBER' (state, payload) {
       state.fansNumber = payload.number
     },
+    'SET_ROOM_INFO' (state, payload) {
+      state.roomInfo = payload.info
+    },
     'CLEAR_ALL_POOL' (state, payload) {
       state.danmakuPool = []
       state.commentPool = []
       state.giftPool = []
       state.onlinePool = []
       state.fansPool = []
+      state.roomInfo = null
     },
     'PUSH_DANMAKU_POOL' (state, payload) {
       state.danmakuPool.push(payload.danmaku)
@@ -263,6 +283,9 @@ export default new Vuex.Store({
     },
     'SET_MUSICCD' (state, payload) {
       state.musicCDMap.set(payload.music.name, payload.music.ts)
+    },
+    'SET_AREA_LIST' (state, payload) {
+      state.areaList = payload.areaList
     }
   },
   actions: {
@@ -307,11 +330,12 @@ export default new Vuex.Store({
       commit('SET_DANMAKU_SERVICE_STATUS', {
         status: 'connect'
       })
-      Live.initRoom({
-        roomId: state.roomId,
+      new Room({
+        url: state.roomId,
         useWebsocket: state.config.useWebsocket,
-        useWSS: state.config.useHttps
-      }).then(room => {
+        useWSS: state.config.useHttps,
+        useGiftBundle: state.config.useGiftEnd
+      }).connect().then(room => {
         if (state.danmakuService) {
           state.danmakuService.disconnect()
           state.danmakuService.removeAllListeners()
@@ -324,90 +348,139 @@ export default new Vuex.Store({
             })
             commit('CLEAR_ALL_POOL')
           }
+          commit('UPDATE_LAST_ROOM_ID')
         }
-        commit('UPDATE_LAST_ROOM_ID')
-        room.on('connect', () => {
-          commit('SET_DANMAKU_SERVICE_STATUS', {
-            status: 'open'
+        room
+          .on('danmaku.connect', () => {
+            commit('SET_DANMAKU_SERVICE_STATUS', {
+              status: 'open'
+            })
           })
-          console.log('open')
-        }).on('close', () => {
-          commit('SET_DANMAKU_SERVICE_STATUS', {
-            status: 'error'
+          .on('danmaku.close', () => {
+            commit('SET_DANMAKU_SERVICE_STATUS', {
+              status: 'error'
+            })
+            restartService = setTimeout(() => {
+              dispatch('START_DANMAKU_SERVICE')
+            }, RECONNECT_DELAY)
           })
-          console.log('close')
-          restartService = setTimeout(() => {
-            dispatch('START_DANMAKU_SERVICE')
-          }, RECONNECT_DELAY)
-        }).on('error', (err) => {
-          commit('SET_DANMAKU_SERVICE_STATUS', {
-            status: 'error'
+          .on('danmaku.error', () => {
+            commit('SET_DANMAKU_SERVICE_STATUS', {
+              status: 'error'
+            })
+            restartService = setTimeout(() => {
+              dispatch('START_DANMAKU_SERVICE')
+            }, RECONNECT_DELAY)
           })
-          console.log('error')
-          restartService = setTimeout(() => {
-            dispatch('START_DANMAKU_SERVICE')
-          }, RECONNECT_DELAY)
-        }).on('data', (msg) => {
-          if (msg.type == 'gift') {
-            if (!state.config.useGiftEnd) {
+          .on('danmaku.message', (msg) => {
+            if (msg.type == 'gift') {
               commit('PUSH_DANMAKU_POOL', {
                 danmaku: msg
               })
               commit('PUSH_GIFT_POOL', {
                 danmaku: msg
               })
-            }
-          } else if (msg.type == 'online') {
-            commit('PUSH_ONLINE_POOL', {
-              danmaku: msg
-            })
-            commit('SET_ONLINE_NUMBER', {
-              number: msg.number
-            })
-          } else if (msg.type == 'fans') {
-            commit('PUSH_FANS_POOL', {
-              danmaku: msg
-            })
-            commit('SET_FANS_NUMBER', {
-              number: msg.total
-            })
-            msg.newFans.map((fan, idx) => {
-              commit('PUSH_DANMAKU_POOL', {
-                danmaku: {
-                  type: 'newFans',
-                  user: fan,
-                  ts: new Date().getTime() + idx
-                }
+            } else if (msg.type == 'online') {
+              commit('PUSH_ONLINE_POOL', {
+                danmaku: msg
               })
+              commit('SET_ONLINE_NUMBER', {
+                number: msg.number
+              })
+            } else if (msg.type == 'comment') {
+              commit('PUSH_DANMAKU_POOL', {
+                danmaku: msg
+              })
+              commit('PUSH_COMMENT_POOL', {
+                danmaku: msg
+              })
+            } else if (msg.type == 'welcome' || msg.type == 'welcomeGuard' || msg.type == 'guardBuy' || msg.type == 'block') {
+              commit('PUSH_DANMAKU_POOL', {
+                danmaku: msg
+              })
+            }
+          })
+          .on('info', (info) => {
+            commit('SET_FANS_NUMBER', {
+              number: info.fans
             })
-          } else if (msg.type == 'comment') {
+            commit('SET_ROOM_INFO', {
+              info: info
+            })
+          })
+          .on('newFans', (fans) => {
+            commit('PUSH_FANS_POOL', {
+              danmaku: fans
+            })
             commit('PUSH_DANMAKU_POOL', {
-              danmaku: msg
+              danmaku: fans
             })
-            commit('PUSH_COMMENT_POOL', {
-              danmaku: msg
-            })
-          } else if (msg.type == 'welcome' || msg.type == 'welcomeGuard' || msg.type == 'guardBuy' || msg.type == 'block') {
-            commit('PUSH_DANMAKU_POOL', {
-              danmaku: msg
-            })
-          }
-        }).on('giftBundle', (msg) => {
-          if (state.config.useGiftEnd) {
-            msg.type = 'gift'
-            commit('PUSH_DANMAKU_POOL', {
-              danmaku: msg
-            })
-            commit('PUSH_GIFT_POOL', {
-              danmaku: msg
-            })
-          }
-        })
+          })
         if (state.userService) {
-          state.userService.setCurrentRoom(room.getInfo().id)
+          state.userService.setRoomId(room.roomId)
         }
         commit('SET_DANMAKU_SERVICE', {
           danmakuService: room
+        })
+      })
+    },
+    'START_USER_SERVICE' ({ state, commit, dispatch }) {
+      new User({
+        cookie: state.cookie,
+        useInfoService: true
+      }).connect().then(user => {
+        if (!user) {
+          dispatch('UPDATE_COOKIE', {
+            cookie: ''
+          })
+          commit('SET_USER_SERVICE', {
+            userService: null
+          })
+          return
+        }
+        new API({
+          cookie: state.cookie
+        }).getUserInfo().then(res => {
+          Statistic.userLogin(state.version, os.platform(), res.user.id, res.room.id)
+        })
+        user
+          .on('info.user', (info) => {
+            commit('SET_USER_INFO', {
+              userInfo: info
+            })
+          })
+          .on('info.room', (info) => {
+            commit('SET_USER_ROOM', {
+              userRoom: info
+            })
+          })
+          .on('send.success', (danmaku) => {
+            commit('PUSH_DANMAKU_POOL', {
+              danmaku: {
+                type: 'sendLog',
+                success: true,
+                msg: ''
+              }
+            })
+          })
+          .on('send.failed', (danmaku, msg) => {
+            commit('PUSH_DANMAKU_POOL', {
+              danmaku: {
+                type: 'sendLog',
+                success: false,
+                msg: msg
+              }
+            })
+          })
+        commit('SET_USER_SERVICE', {
+          userService: user
+        })
+      })
+    },
+    'UPDATE_AREA_LIST' ({ state, commit, dispatch }) {
+      new API().getAreaList().then(res => {
+        commit('SET_AREA_LIST', {
+          areaList: res
         })
       })
     }

@@ -23,34 +23,36 @@
               <Button class="power-btn" v-else type="success" icon="power" size="small" @click="startDanmakuService">开启弹幕姬</Button>
             </Col>
           </Row>
-          <Row class="config-row">
-            <Col span="12">
-              <Checkbox v-model="config.useNotification">启用系统通知</Checkbox>
+          <Row class="info-row" v-if="roomInfo">
+            <Col span="8">
+              <small>直播间标题</small>
             </Col>
-            <Col span="12">
-              <Checkbox v-model="config.useTTS">启动语音播报</Checkbox>
+            <Col span="16">
+              <small>{{ roomInfo.title }}</small>
             </Col>
           </Row>
-          <Form label-position="left" :label-width="96">
-            <Form-item label="声音">
-              <Select v-model="ttsConfig.voice" filterable>
-                <Option v-for="voice in voiceList" :value="voice.idx" :key="voice.name">{{ voice.name }}</Option>
-              </Select>
-            </Form-item>
-            <Form-item label="音高">
-              <Slider v-model="ttsConfig.pitch" :min="0" :max="20" :tip-format="pitchTip"></Slider>
-            </Form-item>
-            <Form-item label="语速">
-              <Slider v-model="ttsConfig.rate" :min="5" :max="30" :tip-format="rateTip"></Slider>
-            </Form-item>
-            <Form-item label="音量">
-              <Slider v-model="ttsConfig.volume" :min="0" :max="100" :tip-format="volumeTip"></Slider>
-            </Form-item>
-          </Form>
+          <Row class="info-row" v-if="roomInfo">
+            <Col span="8">
+              <small>直播间状态</small>
+            </Col>
+            <Col span="16">
+              <small v-if="roomInfo.liveStatus === 'ROUND'" class="round-color">轮播中</small>
+              <small v-else-if="roomInfo.liveStatus === 'LIVE'" class="live-color">直播中 开始于{{ liveStartTime }}</small>
+              <small v-else class="prepare-color">准备中</small>
+            </Col>
+          </Row>
+          <Row class="config-row" v-if="roomInfo">
+            <Col span="8">
+              <small>直播关键帧</small>
+            </Col>
+          </Row>
+          <Row class="info-row" v-if="roomInfo" style="text-align: center">
+            <img class="room-cover" :src="roomInfo.cover" referrerpolicy="no-referrer">
+          </Row>
         </Card>
         <Card class="tile-card connect-card">
           <p slot="title">连接设置</p>
-          <Row class="config-row">
+          <Row class="info-row">
             <Col span="12">
               <Checkbox v-model="config.useHttps" @on-change="startDanmakuService">使用https</Checkbox>
             </Col>
@@ -114,9 +116,33 @@
               <Slider v-model="config.danmakuBackgroundOpacity" :max="100" :min="0" :tip-format="opacityTip"></Slider>
             </Form-item>
           </Form>
-          <Row>
+          <Row class="config-row">
             <Button type="info" @click="sendTestDanmaku">发送测试弹幕</Button>
           </Row>
+          <Row class="config-row">
+            <Col span="12">
+              <Checkbox v-model="config.useNotification">启用系统通知</Checkbox>
+            </Col>
+            <Col span="12">
+              <Checkbox v-model="config.useTTS">启动语音播报</Checkbox>
+            </Col>
+          </Row>
+          <Form label-position="left" :label-width="96">
+            <Form-item label="声音">
+              <Select v-model="ttsConfig.voice" filterable>
+                <Option v-for="voice in voiceList" :value="voice.idx" :key="voice.name">{{ voice.name }}</Option>
+              </Select>
+            </Form-item>
+            <Form-item label="音高">
+              <Slider v-model="ttsConfig.pitch" :min="0" :max="20" :tip-format="pitchTip"></Slider>
+            </Form-item>
+            <Form-item label="语速">
+              <Slider v-model="ttsConfig.rate" :min="5" :max="30" :tip-format="rateTip"></Slider>
+            </Form-item>
+            <Form-item label="音量">
+              <Slider v-model="ttsConfig.volume" :min="0" :max="100" :tip-format="volumeTip"></Slider>
+            </Form-item>
+          </Form>
         </Card>
       </Col>
       <Col span="8" class="tile-col">
@@ -258,6 +284,26 @@ export default {
     },
     danmakuServiceStatus () {
       return this.$store.state.danmakuServiceStatus
+    },
+    roomInfo () {
+      return this.$store.state.roomInfo
+    },
+    areaList () {
+      return this.$store.state.areaList
+    },
+    areaMap () {
+      if (!this.areaList) return null
+      return this.areaList.reduce((map, area) => {
+        map[area.id] = area.name
+        area.list.forEach(subArea => {
+          map[subArea.id] = area.name + '·' + subArea.name
+        })
+        return map
+      }, {})
+    },
+    liveStartTime () {
+      if (!this.roomInfo || !this.roomInfo.liveStartTime) return ''
+      return new Date(this.roomInfo.liveStartTime).toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1")
     }
   },
   watch: {
@@ -272,6 +318,9 @@ export default {
         this.saveTTSConfig()
       },
       deep: true
+    },
+    'config.useGiftEnd' (val) {
+      this.danmakuService.setUseGiftBundle(val)
     },
     'config.useTTS' (val) {
       if (!val) {
@@ -337,6 +386,8 @@ export default {
   flex-direction column
 .config-row
   margin-bottom 8px
+.info-row
+  margin-bottom 0
 .power-btn
   float right
   margin-right 1px
@@ -354,4 +405,15 @@ export default {
   margin-top 8px
 .connect-card
   flex 0.25
+.round-color
+  color #ff9900
+.live-color
+  color #19be6b
+.prepare-color
+  color #2d8cf0
+.room-cover
+  display inline-block
+  max-width 100%
+  height auto
+  max-height 160px
 </style>

@@ -1,7 +1,6 @@
 'use strict'
 
 import electron from 'electron'
-import _ from 'lodash'
 
 const { app, BrowserWindow, dialog, ipcMain, Menu } = electron
 
@@ -38,7 +37,22 @@ const template = [
   }
 ]
 
-let moveEvent = _.debounce(() => {
+function debounce (func, wait, immediate) {
+	let timeout
+	return function() {
+		let context = this, args = arguments;
+		let later = function() {
+			timeout = null
+			if (!immediate) func.apply(context, args)
+		}
+		let callNow = immediate && !timeout
+		clearTimeout(timeout)
+		timeout = setTimeout(later, wait)
+		if (callNow) func.apply(context, args)
+	}
+}
+
+let moveEvent = debounce(() => {
   let bound = toolbarWindow.getBounds()
   danmakuWindow.webContents.send('move', bound.x, bound.y)
 }, MOVE_DELAY)

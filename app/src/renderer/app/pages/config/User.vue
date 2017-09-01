@@ -38,11 +38,12 @@
 </template>
 
 <script>
-import { Util } from 'bilibili-live'
+import { User } from 'bilibili-live'
 
 export default {
   data () {
     return {
+      api: null,
       newAdmin: '',
       adminList: [],
       adminListConfig: [
@@ -115,35 +116,42 @@ export default {
   },
   computed: {
     userRoomID () {
-      return this.userService.getUserRoom().id
+      return this.userService.room.id
+    },
+    cookie () {
+      return this.$store.state.cookie
     },
     userService () {
       return this.$store.state.userService
     }
   },
   created () {
+    this.api = new User({
+      cookie: this.cookie,
+      roomId: this.userRoomID
+    }).api
     this.getAdminList()
     this.getBlockList()
   },
   methods: {
     getAdminList () {
-      Util.getRoomAdmin(this.userRoomID).then(res => {
-        this.adminList = res.map(data => {
+      this.api.getRoomAdminList().then(res => {
+        this.adminList = res.map((item) => {
           return {
-            id: data.admin.id,
-            name: data.admin.name,
-            ctime: data.ctime
+            id: item.admin.id,
+            name: item.admin.name,
+            ctime: item.ctime
           }
         })
       })
     },
     getBlockList () {
-      Util.getRoomBlockList(this.userRoomID, this.blockListPage).then(res => {
-        this.blockList = res.map(data => {
+      this.api.getRoomBlockList(this.blockListPage).then(res => {
+        this.blockList = res.map((item) => {
           return {
-            id: data.id,
-            name: data.user.name,
-            etime: data.blockEndTime
+            id: item.id,
+            name: item.user.name,
+            etime: item.etime
           }
         })
       })
@@ -159,11 +167,9 @@ export default {
       this.getBlockList()
     },
     addNewAdmin () {
-      this.userService.addAdmin(this.newAdmin).then(res => {
-        this.newAdmin = ''
-        let data = JSON.parse(res)
-        if (data.msg) {
-          this.$Message.error(data.msg)
+      this.api.setAdmin(this.newAdmin).then(res => {
+        if (res.msg) {
+          this.$Message.error(res.msg)
         } else {
           this.$Message.success('成功任命管理员')
         }
@@ -171,11 +177,10 @@ export default {
       })
     },
     addNewBlock () {
-      this.userService.blockUser(this.newBlock, this.blockTime).then(res => {
+      this.api.blockUser(this.newBlock, this.blockTime).then(res => {
         this.newBlock = ''
-        let data = JSON.parse(res)
-        if (data.msg) {
-          this.$Message.error(data.msg)
+        if (res.msg) {
+          this.$Message.error(res.msg)
         } else {
           this.$Message.success('成功禁言该用户')
         }
@@ -184,10 +189,9 @@ export default {
     },
     removeAdmin (idx) {
       let adminID = this.adminList[idx].id
-      this.userService.deleteAdmin(adminID).then(res => {
-        let data = JSON.parse(res)
-        if (data.msg) {
-          this.$Message.error(data.msg)
+      this.api.deleteAdmin(adminID).then(res => {
+        if (res.msg) {
+          this.$Message.error(res.msg)
         } else {
           this.$Message.success('成功撤销管理员')
         }
@@ -196,10 +200,9 @@ export default {
     },
     removeBlock (idx) {
       let blockID = this.blockList[idx].id
-      this.userService.deleteBlockUser(blockID).then(res => {
-        let data = JSON.parse(res)
-        if (data.msg) {
-          this.$Message.error(data.msg)
+      this.api.deleteBlockUser(blockID).then(res => {
+        if (res.msg) {
+          this.$Message.error(res.msg)
         } else {
           this.$Message.success('成功撤销禁言')
         }

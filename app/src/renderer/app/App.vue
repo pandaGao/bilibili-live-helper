@@ -90,8 +90,7 @@ export default {
       this.$electron.ipcRenderer.send('sendDanmaku', newDanmaku)
     },
     danmakuService () {
-      this.danmakuService.on('data', this.danmakuHandler)
-      this.danmakuService.on('giftBundle', this.giftHandler)
+      this.danmakuService.on('danmaku.message', this.danmakuHandler)
       if (this.danmakuPool.length) return
       this.poolPointer = 0
       this.$electron.ipcRenderer.send('clearDanmaku')
@@ -105,29 +104,30 @@ export default {
       this.sendMessage(msg)
     })
     this.checkUpdate()
+    this.$store.dispatch('UPDATE_AREA_LIST')
   },
   methods: {
     to (path) {
       this.$router.push(path)
     },
-    giftHandler (msg) {
-      if (this.config.useNotification) {
-        let notification = new Notification(msg.user.name, {
-          body: `赠送${msg.gift.name} × ${msg.gift.count}`
-        })
-      }
-      if (this.config.useTTS) {
-        let synth = speechSynthesis
-        let voices = speechSynthesis.getVoices()
-        let utterThis = new SpeechSynthesisUtterance(msg.user.name+' 赠送 '+ msg.gift.count + '个' + msg.gift.name)
-        utterThis.pitch = this.$store.state.ttsConfig.pitch / 10
-        utterThis.rate = this.$store.state.ttsConfig.rate / 10
-        utterThis.volume = this.$store.state.ttsConfig.volume / 100
-        utterThis.voice = voices[this.$store.state.ttsConfig.voice]
-        synth.speak(utterThis)
-      }
-    },
     danmakuHandler (msg) {
+      if (msg.type == 'gift') {
+        if (this.config.useNotification) {
+          let notification = new Notification(msg.user.name, {
+            body: `赠送${msg.gift.name} × ${msg.gift.count}`
+          })
+        }
+        if (this.config.useTTS) {
+          let synth = speechSynthesis
+          let voices = speechSynthesis.getVoices()
+          let utterThis = new SpeechSynthesisUtterance(msg.user.name+' 赠送 '+ msg.gift.count + '个' + msg.gift.name)
+          utterThis.pitch = this.$store.state.ttsConfig.pitch / 10
+          utterThis.rate = this.$store.state.ttsConfig.rate / 10
+          utterThis.volume = this.$store.state.ttsConfig.volume / 100
+          utterThis.voice = voices[this.$store.state.ttsConfig.voice]
+          synth.speak(utterThis)
+        }
+      }
       if (this.config.useNotification && msg.type == 'comment') {
         let notification = new Notification(msg.user.name, {
           body: msg.comment
@@ -145,7 +145,7 @@ export default {
       }
       if (this.$store.state.musicConfig.start && msg.type == 'comment') {
         let comment = msg.comment+''
-        if (comment.startsWith('#点歌 ')) {
+        if (comment.startsWith('#点歌 ') || comment.startsWith('#點歌 ')) {
           let music = comment.slice(4).toLowerCase().trim()
           let validate = this.validateMusicDanmaku(msg, music)
           if (validate.passed) {
@@ -297,7 +297,7 @@ export default {
       if (!msg || !this.danmakuService || !this.userService) {
         return
       }
-      this.userService.asyncSendMessage(msg)
+      this.userService.sendMessage(msg)
     },
     checkUpdate() {
       Statistic.checkUpdate(this.version, os.platform()).then(res => {
