@@ -1,9 +1,9 @@
 {
   "name": "bilibili-live-helper",
-  "version": "0.0.0",
+  "version": "1.0.1",
   "description": "An electron-vue project",
   "scripts": {
-    "build": "cd app && rm -rf node_modules && cd .. && rm -rf node_modules && cnpm i && node tasks/release.js",
+    "build": "cd app && rm -rf node_modules && cd .. && rm -rf node_modules && npm i && node tasks/release.js",
     "build:clean": "cross-env PLATFORM_TARGET=clean node tasks/release.js",
     "build:darwin": "cross-env PLATFORM_TARGET=darwin node tasks/release.js",
     "build:linux": "cross-env PLATFORM_TARGET=linux node tasks/release.js",
@@ -13,7 +13,7 @@
     "pack": "npm run pack:main && npm run pack:renderer",
     "pack:main": "cross-env NODE_ENV=production webpack -p --progress --colors --config webpack.main.config.js",
     "pack:renderer": "cross-env NODE_ENV=production webpack -p --progress --colors --config webpack.renderer.config.js",
-    "postinstall": "cd app && cnpm i"
+    "postinstall": "cd app && npm i"
   },
   "author": "Greg Holguin <simulatedgreg@gmail.com>",
   "license": "MIT",
@@ -51,9 +51,7 @@
     "vue-style-loader": "^1.0.0",
     "vue-template-compiler": "^2.1.10",
     "webpack": "^2.2.1",
-    "webpack-dev-server": "^2.3.0"
-  },
-  "dependencies": {
+    "webpack-dev-server": "^2.3.0",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1"
   }

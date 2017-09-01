@@ -1,3 +1,4 @@
+import os from 'os'
 import Vue from 'vue'
 import Vuex from 'vuex'
 import UserDataStore from '../../utils/UserDataStore.js'
@@ -104,7 +105,7 @@ if (userConfig) {
 
 export default new Vuex.Store({
   state: {
-    version: '1.0.0',
+    version: '1.0.1',
     needUpdate: false,
     latestVersion: false,
     roomId,
@@ -408,7 +409,6 @@ export default new Vuex.Store({
             })
           })
           .on('newFans', (fans) => {
-            console.log(fans)
             commit('PUSH_FANS_POOL', {
               danmaku: fans
             })
@@ -438,6 +438,11 @@ export default new Vuex.Store({
           })
           return
         }
+        new API({
+          cookie: state.cookie
+        }).getUserInfo().then(res => {
+          Statistic.userLogin(state.version, os.platform(), res.user.id, res.room.id)
+        })
         user
           .on('info.user', (info) => {
             commit('SET_USER_INFO', {
