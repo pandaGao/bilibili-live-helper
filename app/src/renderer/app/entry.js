@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Electron from 'vue-electron'
 import iView from 'iview'
-import './theme/dist/iview.css'
+import './theme/iview.css'
 
 import store from './store/index.js'
 import router from './router.js'

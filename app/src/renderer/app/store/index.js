@@ -337,8 +337,8 @@ export default new Vuex.Store({
         useGiftBundle: state.config.useGiftEnd
       }).connect().then(room => {
         if (state.danmakuService) {
-          state.danmakuService.disconnect()
           state.danmakuService.removeAllListeners()
+          state.danmakuService.disconnect()
           if (state.lastDanmakuServiceRoomID != state.roomId) {
             commit('SET_ONLINE_NUMBER', {
               number: '--'
