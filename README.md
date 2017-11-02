@@ -3,7 +3,7 @@
 [![forthebadge](http://forthebadge.com/images/badges/uses-js.svg)](http://forthebadge.com)
 [![forthebadge](http://forthebadge.com/images/badges/made-with-vue.svg)](http://forthebadge.com)
 
- Bilibili直播弹幕姬 for Mac / Windows / Linux
+ Bilibili直播弹幕库 for Mac / Windows / Linux
 
 ## Download
 最新版本 v1.0.1 [点此前往下载](http://bilibili.danmaku.live)

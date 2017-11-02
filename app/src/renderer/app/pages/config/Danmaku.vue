@@ -335,6 +335,12 @@ export default {
   created () {
     this.config = this.$store.state.config
     this.ttsConfig = this.$store.state.ttsConfig
+    window.speechSynthesis.onvoiceschanged = () => {
+      this.setVoiceList()
+    }
+    setTimeout(() => {
+      this.setVoiceList
+    }, 2000)
   },
   methods: {
     saveConfig () {
@@ -361,6 +367,12 @@ export default {
         content: '弹幕测试',
         ts: new Date().getTime()
       }])
+    },
+    setVoiceList () {
+      this.voiceList = window.speechSynthesis.getVoices().map((voice, idx) => ({
+        idx: idx,
+        name: `${voice.name} ${voice.lang}`
+      }))
     },
     pitchTip (val) {
       return val/10
