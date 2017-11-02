@@ -16,21 +16,24 @@
       <Row v-if="userService" type="flex" align="middle">
         <Col span="20">
           <div class="user-info" v-if="userInfo">
-            <strong>{{userInfo.name}}</strong>
-            <span v-if="userInfo.id" class="uid">UID {{userInfo.id}}</span>
-            <span v-if="userRoom.id" class="uid">直播间 {{userRoom.id}}</span>
-            <div v-if="userInfo && userRoom">
-              <div class="user-progress">
-                <span class="title">UL.{{userInfo.level}}</span>
-                <Progress class="progress" :percent="ulProgress" :stroke-width="6"></Progress>
+            <img class="user-avatar" v-if="userInfo.avatar" :src="userInfo.avatar" referrerpolicy="no-referrer">
+            <div class="user-basic-info">
+              <strong>{{userInfo.name}}</strong>
+              <span v-if="userInfo.id" class="uid">UID {{userInfo.id}}</span>
+              <span v-if="userRoom.id" class="uid">直播间 {{userRoom.id}}</span>
+              <div v-if="userInfo && userRoom">
+                <div class="user-progress">
+                  <span class="title">UL.{{userInfo.level}}</span>
+                  <Progress class="progress" :percent="ulProgress" :stroke-width="6"></Progress>
+                </div>
+                <div v-if="userRoom.id" class="user-progress">
+                  <span class="title">UP.{{userRoom.level}}</span>
+                  <Progress class="progress" :percent="upProgress" :stroke-width="6"></Progress>
+                </div>
               </div>
-              <div v-if="userRoom.id" class="user-progress">
-                <span class="title">UP.{{userRoom.level}}</span>
-                <Progress class="progress" :percent="upProgress" :stroke-width="6"></Progress>
-              </div>
+              <Button type="ghost" size="small" @click="openMyRoomInBrowser">浏览器打开直播间</Button>
+              <Button type="ghost" size="small" @click="logoutUser">登出</Button>
             </div>
-            <Button type="ghost" size="small" @click="openMyRoomInBrowser">浏览器打开直播间</Button>
-            <Button type="ghost" size="small" @click="logoutUser">登出</Button>
           </div>
         </Col>
         <Col span="4">
@@ -170,6 +173,17 @@ export default {
   width 420px
   height 380px
 .user-info
+  display flex
+  .user-avatar
+    width 72px
+    height auto
+    max-height 72px
+    margin-right 10px
+    align-self flex-end
+    border-radius 4px
+    overflow hidden
+  .user-basic-info
+    flex 1
   .uid
     vertical-align bottom
     font-size 12px

@@ -42,7 +42,7 @@
                 <Form-item label="用户点歌间隔">
                   <Row>
                     <Col span="6">
-                      <Input-number :max="9999" :min="1" v-model="musicConfig.userCD"></Input-number>
+                      <Input-number :max="99999" :min="1" v-model="musicConfig.userCD"></Input-number>
                     </Col>
                     <Col span="12"><p>s</p></Col>
                   </Row>
@@ -50,7 +50,7 @@
                 <Form-item label="歌曲重复间隔">
                   <Row>
                     <Col span="6">
-                      <Input-number :max="9999" :min="1" v-model="musicConfig.musicCD"></Input-number>
+                      <Input-number :max="99999" :min="1" v-model="musicConfig.musicCD"></Input-number>
                     </Col>
                     <Col span="12"><p>s</p></Col>
                   </Row>

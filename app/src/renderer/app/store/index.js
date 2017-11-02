@@ -105,7 +105,7 @@ if (userConfig) {
 
 export default new Vuex.Store({
   state: {
-    version: '1.0.1',
+    version: '1.0.2',
     needUpdate: false,
     latestVersion: false,
     roomId,
@@ -270,9 +270,9 @@ export default new Vuex.Store({
     'TOP_MUSIC' (state, payload) {
       let music = state.musicList.splice(payload.index, 1)
       if (state.musicConfig.mode === 1) {
-        state.musicList.splice(1,0, music[0])
+        state.musicList.splice(1, 0, music[0])
       } else {
-        state.musicList.splice(0,0, music[0])
+        state.musicList.splice(0, 0, music[0])
       }
     },
     'ADD_MUSIC_LOG' (state, payload) {
@@ -337,8 +337,8 @@ export default new Vuex.Store({
         useGiftBundle: state.config.useGiftEnd
       }).connect().then(room => {
         if (state.danmakuService) {
-          state.danmakuService.disconnect()
           state.danmakuService.removeAllListeners()
+          state.danmakuService.disconnect()
           if (state.lastDanmakuServiceRoomID != state.roomId) {
             commit('SET_ONLINE_NUMBER', {
               number: '--'

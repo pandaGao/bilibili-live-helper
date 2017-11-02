@@ -5,7 +5,7 @@ const path = require('path')
 let config = {
   // Name of electron app
   // Will be used in production builds
-  name: 'Bilibili直播弹幕姬',
+  name: 'Bilibili直播弹幕库',
 
   // webpack-dev-server port
   port: 9080,
