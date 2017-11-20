@@ -41,7 +41,7 @@
             <Button type="info" size="large">直播间管理</Button>
           </router-link>
           <router-link v-if="$route.path == '/config/user'"  to="/config/danmaku" tag="div">
-            <Button type="info" size="large">弹幕姬设置</Button>
+            <Button type="info" size="large">弹幕库设置</Button>
           </router-link>
         </Col>
       </Row>

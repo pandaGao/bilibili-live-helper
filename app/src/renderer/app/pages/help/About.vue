@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h4 class="title">Bilibili直播弹幕姬</h4>
+    <h4 class="title">Bilibili直播弹幕库</h4>
     <p>当前版本: {{ version }}</p>
     <h4 v-if="needUpdate">最新版本: {{ latestVersion }} 请点击下方官网链接前往下载</h4>
     <p v-else>已是最新版本</p>
@@ -25,7 +25,7 @@
     </Row>
     <p>同时也欢迎到GitHub上提PR 很希望能和各位一起完善这个项目</p>
     <br>
-    <div>直播弹幕姬官网 <span class="url" @click="gotoDanmakuWebsite">bilibili.danmaku.live</span></div>
+    <div>直播弹幕库官网 <span class="url" @click="gotoDanmakuWebsite">bilibili.danmaku.live</span></div>
     <div class="author">作者 清古</div>
     <br>
     <br>

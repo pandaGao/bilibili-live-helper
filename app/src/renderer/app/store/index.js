@@ -105,7 +105,7 @@ if (userConfig) {
 
 export default new Vuex.Store({
   state: {
-    version: '1.0.2',
+    version: '1.0.3',
     needUpdate: false,
     latestVersion: false,
     roomId,
@@ -401,9 +401,6 @@ export default new Vuex.Store({
             }
           })
           .on('info', (info) => {
-            commit('SET_FANS_NUMBER', {
-              number: info.fans
-            })
             commit('SET_ROOM_INFO', {
               info: info
             })
@@ -414,6 +411,11 @@ export default new Vuex.Store({
             })
             commit('PUSH_DANMAKU_POOL', {
               danmaku: fans
+            })
+          })
+          .on('fansCount', (fansCount) => {
+            commit('SET_FANS_NUMBER', {
+              number: fansCount
             })
           })
         if (state.userService) {

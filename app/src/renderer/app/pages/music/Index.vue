@@ -4,8 +4,8 @@
       <Col class="tile-col" span="12">
         <Card class="tile-card">
           <p slot="title">点歌板</p>
-          <Tabs value="config">
-            <Tab-pane label="设置" name="config">
+          <Tabs size="small" value="config" class="tab-bar">
+            <Tab-pane label="设置" name="config" class="tab-music">
               <Form label-position="left" :label-width="96">
                 <Form-item label="点歌状态">
                   <i-switch v-model="musicConfig.start" size="large">
@@ -23,7 +23,7 @@
                   <Radio-group v-model="musicConfig.limitType">
                     <Radio :label="0">无</Radio>
                     <Radio :label="1">用户等级</Radio>
-                    <Tooltip content="选择此项时请使用短位ID开启弹幕姬" placement="top">
+                    <Tooltip content="选择此项时请使用短位ID开启弹幕库" placement="top">
                       <Radio :label="2">粉丝勋章</Radio>
                     </Tooltip>
                   </Radio-group>
@@ -431,7 +431,7 @@ export default {
     },
     sendTestDanmaku () {
       if (!this.danmakuService) {
-        this.$Message.warning('请先开启弹幕姬')
+        this.$Message.warning('请先开启弹幕库')
         return
       }
       if (!this.userService) {
@@ -498,6 +498,11 @@ export default {
 }
 </script>
 
+<style lang="stylus">
+.ivu-tabs-nav-scroll-disabled
+  display none
+</style>
+
 <style lang="stylus" scoped>
 .music-container
   display flex
@@ -517,6 +522,8 @@ export default {
   margin-top 8px
 .ivu-form-item
   margin-bottom 4px
+.tab-bar
+  display relative
 .tab-music
   padding 1px
 .block-input

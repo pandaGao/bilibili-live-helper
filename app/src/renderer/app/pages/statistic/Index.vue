@@ -137,7 +137,7 @@ export default {
   },
   methods: {
     giftImage (id) {
-      return `http://static.hdslb.com/live-static/live-room/images/gift-section/gift-${id}.png`
+      return `http://s1.hdslb.com/bfs/static/blive/blfe-live-room/static/img/gift-images/image-png/gift-${id}.png`
     },
     initChart () {
       this.chart = echarts.init(this.$refs.chart)
