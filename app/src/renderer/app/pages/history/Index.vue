@@ -240,7 +240,7 @@ export default {
       return "guard-user-"+level
     },
     giftImage (id) {
-      return `http://static.hdslb.com/live-static/live-room/images/gift-section/gift-${id}.png`
+      return `http://s1.hdslb.com/bfs/static/blive/blfe-live-room/static/img/gift-images/image-png/gift-${id}.png`
     },
     titleImage (source) {
       let uri = source.replace('title-', 'title/')
@@ -264,7 +264,7 @@ export default {
         return
       }
       if (!this.danmakuService) {
-        this.$Message.warning('请先开启弹幕姬')
+        this.$Message.warning('请先开启弹幕库')
         return
       }
       if (!this.userService) {

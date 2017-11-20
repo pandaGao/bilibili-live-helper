@@ -38,18 +38,19 @@ const template = [
 ]
 
 function debounce (func, wait, immediate) {
-	let timeout
-	return function() {
-		let context = this, args = arguments;
-		let later = function() {
-			timeout = null
-			if (!immediate) func.apply(context, args)
-		}
-		let callNow = immediate && !timeout
-		clearTimeout(timeout)
-		timeout = setTimeout(later, wait)
-		if (callNow) func.apply(context, args)
-	}
+  let timeout
+  return function () {
+    let context = this
+    let args = arguments
+    let later = function () {
+      timeout = null
+      if (!immediate) func.apply(context, args)
+    }
+    let callNow = immediate && !timeout
+    clearTimeout(timeout)
+    timeout = setTimeout(later, wait)
+    if (callNow) func.apply(context, args)
+  }
 }
 
 let moveEvent = debounce(() => {
@@ -159,8 +160,8 @@ function createMainWindow () {
   ipcMain.on('quitApp', (evt) => {
     dialog.showMessageBox({
       type: 'warning',
-      message: '真的要退出Bilibili弹幕姬吗？',
-      buttons: ['是','否'],
+      message: '真的要退出Bilibili弹幕库吗？',
+      buttons: ['是', '否'],
       defaultId: 0,
       cancelId: 1
     }, (res) => {

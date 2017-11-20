@@ -13,14 +13,14 @@
           </Row>
           <Row class="config-row">
             <Col span="14">
-              <small v-if="danmakuServiceStatus == 'close'">弹幕姬状态: 未开启</small>
-              <small v-if="danmakuServiceStatus == 'connect'">弹幕姬状态: 连接中</small>
-              <small v-if="danmakuServiceStatus == 'open'">弹幕姬状态: 已连接</small>
-              <small v-if="danmakuServiceStatus == 'error'">弹幕姬状态: 连接出错</small>
+              <small v-if="danmakuServiceStatus == 'close'">弹幕库状态: 未开启</small>
+              <small v-if="danmakuServiceStatus == 'connect'">弹幕库状态: 连接中</small>
+              <small v-if="danmakuServiceStatus == 'open'">弹幕库状态: 已连接</small>
+              <small v-if="danmakuServiceStatus == 'error'">弹幕库状态: 连接出错</small>
             </Col>
             <Col span="10">
-              <Button class="power-btn" v-if="danmakuService" type="warning" icon="refresh" size="small" @click="startDanmakuService">重启弹幕姬</Button>
-              <Button class="power-btn" v-else type="success" icon="power" size="small" @click="startDanmakuService">开启弹幕姬</Button>
+              <Button class="power-btn" v-if="danmakuService" type="warning" icon="refresh" size="small" @click="startDanmakuService">重启弹幕库</Button>
+              <Button class="power-btn" v-else type="success" icon="power" size="small" @click="startDanmakuService">开启弹幕库</Button>
             </Col>
           </Row>
           <Row class="info-row" v-if="roomInfo">
@@ -36,14 +36,14 @@
               <small>直播间状态</small>
             </Col>
             <Col span="16">
-              <small v-if="roomInfo.liveStatus === 'ROUND'" class="round-color">轮播中</small>
-              <small v-else-if="roomInfo.liveStatus === 'LIVE'" class="live-color">直播中 开始于{{ liveStartTime }}</small>
+              <small v-if="roomInfo.liveStatus === 2" class="round-color">轮播中</small>
+              <small v-else-if="roomInfo.liveStatus === 1" class="live-color">直播中 开始于{{ liveStartTime }}</small>
               <small v-else class="prepare-color">准备中</small>
             </Col>
           </Row>
           <Row class="config-row" v-if="roomInfo">
             <Col span="8">
-              <small>直播关键帧</small>
+              <small>直播间封面</small>
             </Col>
           </Row>
           <Row class="info-row" v-if="roomInfo" style="text-align: center">
@@ -244,22 +244,6 @@ export default {
         {
           idx: 0,
           name: 'Ting-Ting zh-CN'
-        },
-        {
-          idx: 26,
-          name: 'Mei-Jia zh-TW'
-        },
-        {
-          idx: 36,
-          name: 'Sin-ji zh-HK'
-        },
-        {
-          idx: 19,
-          name: 'Kyoko ja-JP'
-        },
-        {
-          idx: 43,
-          name: 'Yuna ko-KR'
         }
       ]
     }
@@ -338,9 +322,11 @@ export default {
     window.speechSynthesis.onvoiceschanged = () => {
       this.setVoiceList()
     }
+  },
+  mounted () {
     setTimeout(() => {
-      this.setVoiceList
-    }, 2000)
+      this.setVoiceList()
+    }, 1000)
   },
   methods: {
     saveConfig () {
