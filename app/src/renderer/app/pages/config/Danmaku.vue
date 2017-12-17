@@ -118,6 +118,7 @@
           </Form>
           <Row class="config-row">
             <Button type="info" @click="sendTestDanmaku">发送测试弹幕</Button>
+            <Button type="warning" @click="reloadDanmakuWindow">重载弹幕视窗</Button>
           </Row>
           <Row class="config-row">
             <Col span="12">
@@ -304,7 +305,9 @@ export default {
       deep: true
     },
     'config.useGiftEnd' (val) {
-      this.danmakuService.setUseGiftBundle(val)
+      if (this.danmakuService) {
+        this.danmakuService.setUseGiftBundle(val)
+      }
     },
     'config.useTTS' (val) {
       if (!val) {
@@ -353,6 +356,9 @@ export default {
         content: '弹幕测试',
         ts: new Date().getTime()
       }])
+    },
+    reloadDanmakuWindow () {
+      this.$electron.ipcRenderer.send('reloadDanmakuWindow')
     },
     setVoiceList () {
       this.voiceList = window.speechSynthesis.getVoices().map((voice, idx) => ({

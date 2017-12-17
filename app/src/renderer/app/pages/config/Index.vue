@@ -32,6 +32,7 @@
                 </div>
               </div>
               <Button type="ghost" size="small" @click="openMyRoomInBrowser">浏览器打开直播间</Button>
+              <Button type="ghost" size="small" @click="openSettingPageInBrowser">浏览器打开直播设置页</Button>
               <Button type="ghost" size="small" @click="logoutUser">登出</Button>
             </div>
           </div>
@@ -150,6 +151,9 @@ export default {
     },
     openMyRoomInBrowser () {
       this.$electron.shell.openExternal('http://live.bilibili.com/'+this.userRoom.id)
+    },
+    openSettingPageInBrowser () {
+      this.$electron.shell.openExternal('https://link.bilibili.com/p/center/index#/my-room/start-live')
     }
   }
 }

@@ -105,7 +105,7 @@ if (userConfig) {
 
 export default new Vuex.Store({
   state: {
-    version: '1.0.3',
+    version: '1.1.0',
     needUpdate: false,
     latestVersion: false,
     roomId,
@@ -336,6 +336,13 @@ export default new Vuex.Store({
         useWSS: state.config.useHttps,
         useGiftBundle: state.config.useGiftEnd
       }).connect().then(room => {
+        if (!room) {
+          commit('SET_DANMAKU_SERVICE_STATUS', {
+            status: 'error'
+          })
+          return
+        }
+
         if (state.danmakuService) {
           state.danmakuService.removeAllListeners()
           state.danmakuService.disconnect()
@@ -360,6 +367,7 @@ export default new Vuex.Store({
             commit('SET_DANMAKU_SERVICE_STATUS', {
               status: 'error'
             })
+            clearTimeout(restartService)
             restartService = setTimeout(() => {
               dispatch('START_DANMAKU_SERVICE')
             }, RECONNECT_DELAY)
@@ -368,6 +376,7 @@ export default new Vuex.Store({
             commit('SET_DANMAKU_SERVICE_STATUS', {
               status: 'error'
             })
+            clearTimeout(restartService)
             restartService = setTimeout(() => {
               dispatch('START_DANMAKU_SERVICE')
             }, RECONNECT_DELAY)

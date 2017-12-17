@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Electron from 'vue-electron'
 import iView from 'iview'
-import './theme/iview.css'
+import './theme/base.less'
 
 import store from './store/index.js'
 import router from './router.js'
@@ -60,7 +60,7 @@ new Vue({
       this.musicPlayed = this.formatTime(this.musicPlayer.currentTime)
       this.musicProgress = this.musicPlayer.currentTime / this.musicPlayer.duration
       if (this.musicLyrics) {
-        this.musicLyricsIdx = this.musicLyrics.findIndex(this.musicPlayer.currentTime*1000)
+        this.musicLyricsIdx = this.musicLyrics.findIndex(this.musicPlayer.currentTime * 1000)
       }
     })
     this.musicPlayer.addEventListener('error', (e) => {
@@ -112,7 +112,7 @@ new Vue({
     },
     nextMusic () {
       this.musicPlayer.pause()
-      this.$store.commit('FINISH_MUSIC_LIST',{
+      this.$store.commit('FINISH_MUSIC_LIST', {
         index: 0
       })
       this.musicInfo = {
@@ -158,10 +158,10 @@ new Vue({
     formatTime (second) {
       second = Math.round(second)
       let m = Math.floor(second / 60)
-      m = m < 10 ? '0'+m : ''+m
-      let s = second - m*60
-      s = s < 10 ? '0'+s : ''+s
-      return m+':'+s
+      m = m < 10 ? '0' + m : '' + m
+      let s = second - m * 60
+      s = s < 10 ? '0' + s : '' + s
+      return m + ':' + s
     }
   }
 }).$mount('#app')
