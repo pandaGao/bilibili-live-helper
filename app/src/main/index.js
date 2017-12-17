@@ -124,6 +124,10 @@ function createMainWindow () {
   })
 
   // mainWindow to danmakuWindow
+  ipcMain.on('reloadDanmakuWindow', (evt) => {
+    danmakuWindow.reload()
+  })
+
   ipcMain.on('sendConfig', (evt, config) => {
     danmakuWindow.webContents.send('newConfig', config)
   })

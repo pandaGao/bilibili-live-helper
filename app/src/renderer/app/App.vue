@@ -16,6 +16,9 @@
           <Menu-item name="/music" @click.native="to('/music')">
             <Icon type="music-note" :style="{marginRight: '3px'}" :size="iconSize"></Icon>
           </Menu-item>
+          <Menu-item name="/lottery" @click.native="to('/lottery')">
+            <Icon type="trophy" :size="iconSize"></Icon>
+          </Menu-item>
           <Menu-item name="/statistic" @click.native="to('/statistic')">
             <Icon type="podium" :size="iconSize"></Icon>
           </Menu-item>
@@ -97,6 +100,14 @@ export default {
     }
   },
   created () {
+    window.addEventListener('online',  () => {
+      if (!this.$store.state.danmakuServiceStatus === 'close') {
+        this.$store.dispatch({
+          type: 'START_DANMAKU_SERVICE'
+        })
+      }
+      console.log('online')
+    })
     this.$electron.ipcRenderer.on('changePage', (evt, url) => {
       this.to(url)
     })

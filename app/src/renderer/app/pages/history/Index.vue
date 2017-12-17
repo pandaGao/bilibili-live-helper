@@ -243,6 +243,9 @@ export default {
       return `http://s1.hdslb.com/bfs/static/blive/blfe-live-room/static/img/gift-images/image-png/gift-${id}.png`
     },
     titleImage (source) {
+      if (!source) {
+        return ''
+      }
       let uri = source.replace('title-', 'title/')
       return `http://s1.hdslb.com/bfs/static/blive/live-assets/${uri}.png`
     },

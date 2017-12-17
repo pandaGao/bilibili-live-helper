@@ -6,6 +6,7 @@ import DanmakuConfig from './pages/config/Danmaku.vue'
 import UserConfig from './pages/config/User.vue'
 import History from './pages/history/Index.vue'
 import Music from './pages/music/Index.vue'
+import Lottery from './pages/lottery/Index.vue'
 import Statistic from './pages/statistic/Index.vue'
 import Help from './pages/help/Index.vue'
 import About from './pages/help/About.vue'
@@ -40,7 +41,7 @@ export default new VueRouter({
         {
           path: 'user',
           component: UserConfig
-        },
+        }
       ]
     },
     {
@@ -50,6 +51,10 @@ export default new VueRouter({
     {
       path: '/music',
       component: Music
+    },
+    {
+      path: '/lottery',
+      component: Lottery
     },
     {
       path: '/statistic',
