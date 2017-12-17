@@ -6,7 +6,7 @@
  Bilibili直播弹幕库 for Mac / Windows / Linux
 
 ## Download
-最新版本 v1.0.3 [点此前往下载](http://bilibili.danmaku.live)
+最新版本 v1.1.0 [点此前往下载](http://bilibili.danmaku.live)
 
 ## Features
 * 支持 MacOS Windows Linux
@@ -33,6 +33,7 @@
 * 支持语音播报
 * 支持系统提示
 * 支持弹幕统计
+* 支持礼物抽奖
 * 自动检查更新
 
 ## Messages
@@ -40,6 +41,12 @@
  * Linux用户在启动时需要加上`--enable-transparent-visuals` 和 `--disable-gpu` 参数以支持透明窗口
 
 ## Change Logs
+* 2017-12-17 - v1.1.0
+  * 新增抽奖面板 - 用户赠送指定礼物可参与抽奖
+  * 增加浏览器打开直播设置页按钮 - 登录后可见
+  * 增加重载弹幕视图按钮 - 可在弹幕视图卡死时使用
+  * 修复网络连接断开后 无法重连弹幕库的问题
+  * 修复部分可能导致弹幕视图卡死的问题
 * 2017-11-21 - v1.0.3
   * 修复B站API改版导致的连接问题
   * 修正礼物图片地址
