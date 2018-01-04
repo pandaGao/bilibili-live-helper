@@ -60,6 +60,10 @@
                     <Col span="12"><Slider v-model="musicVolume" :min="0" :max="100"></Slider></Col>
                   </Row>
                 </Form-item>
+                <Form-item label="输出文件夹">
+                  <p>{{ outputFilePath }}</p>
+                  <small>弹幕库会将当前点歌列表和已完成列表以txt文件形式输出到该文件夹 可以通过obs "文本->从文件读取"捕获到直播流</small>
+                </Form-item>
               </Form>
               <Button type="info" @click="sendTestDanmaku">发送点歌示例弹幕</Button>
             </Tab-pane>
@@ -131,9 +135,13 @@
 </template>
 
 <script>
+import path from 'path'
+import fs from 'fs'
+
 export default {
   data () {
     return {
+      outputFilePath: '',
       newBlock: '',
       musicConfig: {
         start: false,
@@ -411,11 +419,20 @@ export default {
     },
     musicVolume (val) {
       this.$root.setPlayerVolume(val/100)
+    },
+    musicList () {
+      this.updateMusicListFile()
+    },
+    finishList () {
+      this.updateFinishListFile()
     }
   },
   created () {
     this.musicConfig = this.$store.state.musicConfig
     this.musicVolume = this.$root.musicPlayer.volume * 100
+    this.outputFilePath =  path.join(this.$electron.remote.app.getPath('home'), '/bilibili-live-helper')
+    this.updateMusicListFile()
+    this.updateFinishListFile()
   },
   mounted () {
     this.$nextTick(() => {
@@ -423,6 +440,23 @@ export default {
     })
   },
   methods: {
+    writeFile (filename, content) {
+      let homePath = this.$electron.remote.app.getPath('home')
+      let appPath = path.join(homePath, '/bilibili-live-helper')
+      let filePath = path.join(homePath, '/bilibili-live-helper', `${filename}.txt`)
+      if (!fs.existsSync(appPath)){
+        fs.mkdirSync(appPath)
+      }
+      fs.writeFileSync(filePath, content, 'utf8')
+    },
+    updateMusicListFile () {
+      let content = this.musicList.map(x => `${x.name}`).join('\n')
+      this.writeFile('current_music_list', content)
+    },
+    updateFinishListFile () {
+      let content = this.finishList.map(x => `${x.name}`).join('\n')
+      this.writeFile('finished_music_list', content)
+    },
     saveConfig () {
       this.$store.dispatch({
         type: 'UPDATE_MUSIC_CONFIG',
@@ -504,6 +538,8 @@ export default {
 </style>
 
 <style lang="stylus" scoped>
+small
+  line-height 100%
 .music-container
   display flex
   flex-direction column

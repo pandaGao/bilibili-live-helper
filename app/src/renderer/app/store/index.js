@@ -43,7 +43,8 @@ let config = {
   useWebsocket: true,
   useHttps: false,
   useNotification: false,
-  useTTS: false
+  useTTS: false,
+  blockSmallTV: true
 }
 
 let ttsConfig = {
@@ -105,7 +106,7 @@ if (userConfig) {
 
 export default new Vuex.Store({
   state: {
-    version: '1.1.0',
+    version: '1.1.1',
     needUpdate: false,
     latestVersion: false,
     roomId,
@@ -397,6 +398,9 @@ export default new Vuex.Store({
                 number: msg.number
               })
             } else if (msg.type == 'comment') {
+              if (state.config.blockSmallTV && msg.comment === '- ( ゜- ゜)つロ 乾杯~ - bilibili') {
+                return
+              }
               commit('PUSH_DANMAKU_POOL', {
                 danmaku: msg
               })
