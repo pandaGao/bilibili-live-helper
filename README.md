@@ -6,7 +6,7 @@
  Bilibili直播弹幕库 for Mac / Windows / Linux
 
 ## Download
-最新版本 v1.1.0 [点此前往下载](http://bilibili.danmaku.live)
+最新版本 v1.1.1 [点此前往下载](http://bilibili.danmaku.live)
 
 ## Features
 * 支持 MacOS Windows Linux
