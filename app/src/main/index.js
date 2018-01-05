@@ -4,6 +4,8 @@ import electron from 'electron'
 
 const { app, BrowserWindow, dialog, ipcMain, Menu } = electron
 
+app.disableHardwareAcceleration()
+
 let mainWindow, toolbarWindow, danmakuWindow
 
 const mainURL = process.env.NODE_ENV === 'development'
@@ -73,6 +75,7 @@ function createMainWindow () {
 
   mainWindow.on('closed', () => {
     mainWindow = null
+    app.quit()
   })
 
   toolbarWindow = new BrowserWindow({
@@ -84,7 +87,8 @@ function createMainWindow () {
     frame: false,
     alwaysOnTop: true,
     resizable: false,
-    hasShadow: false
+    hasShadow: false,
+    skipTaskbar: true
   })
 
   toolbarWindow.loadURL(toolbarURL)
