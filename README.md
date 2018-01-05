@@ -6,7 +6,7 @@
  Bilibili直播弹幕库 for Mac / Windows / Linux
 
 ## Download
-最新版本 v1.1.0 [点此前往下载](http://bilibili.danmaku.live)
+最新版本 v1.1.1 [点此前往下载](http://bilibili.danmaku.live)
 
 ## Features
 * 支持 MacOS Windows Linux
@@ -41,6 +41,12 @@
  * Linux用户在启动时需要加上`--enable-transparent-visuals` 和 `--disable-gpu` 参数以支持透明窗口
 
 ## Change Logs
+* 2018-01-05 - v1.1.1
+  * 修复点歌无法正确获取播放地址的问题
+  * 增加输出当前点歌列表和已完成歌曲列表到文件的功能 用于obs文本捕获
+  * 设置中新增屏蔽小电视弹幕选项 默认开启
+  * 工具栏窗口不再会出现在任务栏中
+  * 主窗口现在可以直接被窗口捕捉
 * 2017-12-17 - v1.1.0
   * 新增抽奖面板 - 用户赠送指定礼物可参与抽奖
   * 增加浏览器打开直播设置页按钮 - 登录后可见

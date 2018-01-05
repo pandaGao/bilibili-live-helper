@@ -173,6 +173,11 @@
               <Checkbox v-model="config.blockMessage">禁言用户提示</Checkbox>
             </Col>
           </Row>
+          <Row class="config-row">
+            <Col span="12">
+              <Checkbox v-model="config.blockSmallTV">屏蔽小电视弹幕</Checkbox>
+            </Col>
+          </Row>
         </Card>
         <Card class="tile-card">
           <p slot="title">评论弹幕组成</p>
@@ -233,7 +238,8 @@ export default {
         useWebsocket: true,
         useHttps: false,
         useNotification: false,
-        useTTS: false
+        useTTS: false,
+        blockSmallTV: true
       },
       ttsConfig: {
         voice: 0,

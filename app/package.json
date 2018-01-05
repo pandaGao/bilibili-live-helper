@@ -9,7 +9,7 @@
     "echarts": "^3.6.2",
     "iview": "^2.0.0-rc.17",
     "lodash": "^4.17.4",
-    "simple-netease-cloud-music": "^0.1.8",
+    "simple-netease-cloud-music": "^0.3.1",
     "vue": "^2.1.10",
     "vue-electron": "^1.0.6",
     "vue-router": "^2.1.2",
