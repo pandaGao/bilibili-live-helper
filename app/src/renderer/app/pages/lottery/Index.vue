@@ -30,6 +30,8 @@
           <Button type="info" v-if="lotteryProcess === 2" @click="doFilterLottery">玄学时刻</Button>
           <Button type="success" v-if="lotteryProcess === 2" @click="doDirectLottery">一发入魂</Button>
           <Button type="error" v-if="lotteryProcess === 3" @click="finishLottery">结束抽奖</Button>
+          <Button type="success" v-if="lotteryProcess === 0" @click="saveResult" style="float: right">保存结果</Button>
+
           <br/><br/>
           <Table v-if="lotteryProcess === 0" size="small" height="285" :columns="winnerListConfig" :data="winnerList"></Table>
           <div v-if="lotteryProcess > 0">
@@ -70,6 +72,7 @@
 </template>
 
 <script>
+import * as saveAs from 'file-saver/FileSaver.min.js' 
 export default {
   data () {
     return {
@@ -105,7 +108,7 @@ export default {
   computed: {
     danmakuService () {
       return this.$store.state.danmakuService
-    }
+    } 
   },
   watch: {
     playerList () {
@@ -195,6 +198,14 @@ export default {
     clearWinnerList () {
       this.winnerMap = {}
       this.winnerList = []
+    },
+    saveResult(){
+      var text="#    中奖者    UID\n";
+      for (var i = 0; i < this.winnerList.length; i++) {
+        text=text+(i+1)+"    "+this.winnerList[i].name+"    "+this.winnerList[i].id+"\n"
+      }
+      var blob = new Blob([text], {type: "text/plain;charset=utf-8"});
+      saveAs.saveAs(blob, "lottery_result.txt");
     }
   }  
 }
