@@ -80,7 +80,6 @@ export default {
       lotteryRound: 0,
       allowLotteryAgain: false,
       playerList: [],
-      winnerList: [],
       playerMap: {},
       winnerMap: {},
       lotteryList: [],
@@ -105,6 +104,9 @@ export default {
   computed: {
     danmakuService () {
       return this.$store.state.danmakuService
+    },
+    winnerList () {
+      return this.$root.lotteryWinnerList
     }
   },
   watch: {
@@ -194,7 +196,7 @@ export default {
     },
     clearWinnerList () {
       this.winnerMap = {}
-      this.winnerList = []
+      this.winnerList.splice(0)
     }
   }  
 }

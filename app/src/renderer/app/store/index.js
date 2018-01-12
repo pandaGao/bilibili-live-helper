@@ -44,7 +44,9 @@ let config = {
   useHttps: false,
   useNotification: false,
   useTTS: false,
-  blockSmallTV: true
+  blockSmallTV: true,
+  theme: 'default',
+  themeLink: ''
 }
 
 let ttsConfig = {
@@ -65,7 +67,8 @@ let musicConfig = {
   limitType: 0,
   limitCount: 1,
   userCD: 60,
-  musicCD: 1800
+  musicCD: 1800,
+  platform: 'kugou'
 }
 
 let blockList = []
@@ -106,7 +109,7 @@ if (userConfig) {
 
 export default new Vuex.Store({
   state: {
-    version: '1.1.1',
+    version: '1.1.2',
     needUpdate: false,
     latestVersion: false,
     roomId,
