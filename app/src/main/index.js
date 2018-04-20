@@ -3,7 +3,7 @@
 import electron from 'electron'
 
 const { app, BrowserWindow, dialog, ipcMain, Menu } = electron
-
+const os = require('os');
 app.disableHardwareAcceleration()
 
 let mainWindow, toolbarWindow, danmakuWindow
@@ -66,9 +66,10 @@ function createMainWindow () {
   mainWindow = new BrowserWindow({
     width: 1024,
     height: 672,
-    resizable: false,
-    fullscreenable: false,
-    frame: false
+    resizable: true,
+    fullscreenable: true,
+    frame: true,
+    titleBarStyle:os.platform() == 'darwin' ? 'hidden' : 'default'
   })
 
   mainWindow.loadURL(mainURL)

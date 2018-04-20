@@ -1,11 +1,12 @@
+<style lang="stylus" scoped>
+.platform-darwin
+  .icon-menu-group
+    margin-top 64px
+</style>
 <template>
-  <Row type="flex" class="app-container">
+  <Row type="flex" :class="[containerClass]">
     <Col span="2">
       <Menu theme="dark" :active-name="currentPage" width="auto" class="icon-menu">
-        <div class="toolbar">
-          <Button icon="close-round" type="text" size="small" @click="quitApp"></Button>
-          <Button icon="minus-round" type="text" size="small" @click="minimizeWindow"></Button>
-        </div>
         <div class="icon-menu-group">
           <Menu-item name="/config" @click.native="to('/config')">
             <Icon type="gear-a" :size="25"></Icon>
@@ -44,6 +45,7 @@ import Statistic from '../utils/Statistic.js'
 export default {
   data () {
     return {
+      containerClass: ['app-container', 'platform-' + os.platform()],
       iconSize: 24,
       poolPointer: 0
     }
