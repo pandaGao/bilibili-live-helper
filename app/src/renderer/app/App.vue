@@ -1,7 +1,6 @@
 <style lang="stylus" scoped>
-.platform-darwin
-  .icon-menu-group
-    margin-top 64px
+.icon-menu-group
+  margin-top 64px
 </style>
 <template>
   <Row type="flex" :class="[containerClass]">
@@ -102,6 +101,14 @@ export default {
     }
   },
   created () {
+    window.onbeforeunload = (e) => {
+    
+    if(confirm('真的要退出Bilibili弹幕库吗？')){
+      this.quitApp();
+    }else{
+      e.returnValue = false;
+    }
+  }
     window.addEventListener('online',  () => {
       if (!this.$store.state.danmakuServiceStatus === 'close') {
         this.$store.dispatch({
