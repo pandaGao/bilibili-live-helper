@@ -117,6 +117,8 @@ function createMainWindow () {
 
   danmakuWindow.setIgnoreMouseEvents(true)
   danmakuWindow.loadURL(danmakuURL)
+  toolbarWindow.setAlwaysOnTop(true)
+  danmakuWindow.setAlwaysOnTop(true)
 
   danmakuWindow.on('closed', () => {
     danmakuWindow = null
