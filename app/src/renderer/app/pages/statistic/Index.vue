@@ -15,7 +15,7 @@
           <div class="danmaku-count">收到 {{giftCount}} 件礼物 总计 {{giftPrice}} 瓜子</div>
           <div class="gift-box-container">
             <div class="gift-box" v-for="gift in giftStatistic">
-              <img class="gift-img" :src="giftImage(gift.id)">
+              <img class="gift-img" :src="getRoomGiftImage(gift.id)">
               <div class="gift-count">×{{ gift.count }}</div>
             </div>
           </div>
@@ -32,8 +32,10 @@
 
 <script>
 import * as echarts from 'echarts/dist/echarts.common.min.js'
+import GiftImageMixin from '../../mixins/giftImage.js'
 
 export default {
+  mixins: [ GiftImageMixin ],
   data () {
     return {
       chart: null,
@@ -56,6 +58,9 @@ export default {
     }
   },
   computed: {
+    danmakuService () {
+      return this.$store.state.danmakuService
+    },
     onlinePool () {
       return this.$store.state.onlinePool.filter((i, idx) => !(idx%3)).map(msg => {
         return {
@@ -136,9 +141,6 @@ export default {
     })
   },
   methods: {
-    giftImage (id) {
-      return `http://s1.hdslb.com/bfs/static/blive/blfe-live-room/static/img/gift-images/image-png/gift-${id}.png`
-    },
     initChart () {
       this.chart = echarts.init(this.$refs.chart)
       this.chart.setOption({

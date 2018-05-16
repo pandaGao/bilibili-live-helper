@@ -19,6 +19,11 @@
                     <Radio :label="1">点歌模式</Radio>
                   </Radio-group>
                 </Form-item>
+                <Form-item label="音源选择" v-if="musicConfig.mode === 1">
+                  <Radio-group v-model="musicConfig.platform">
+                    <Radio v-for="(platform, idx) in musicPlatforms" :key="idx" :label="platform.platform">{{platform.name}}</Radio>
+                  </Radio-group>
+                </Form-item>
                 <Form-item label="点歌限制">
                   <Radio-group v-model="musicConfig.limitType">
                     <Radio :label="0">无</Radio>
@@ -149,7 +154,8 @@ export default {
         limitType: 0,
         limitCount: 1,
         userCD: 60,
-        musicCD: 1800
+        musicCD: 1800,
+        platform: 'kugou'
       },
       musicVolume: 100,
       musicLyrics: [],
@@ -378,6 +384,9 @@ export default {
     danmakuService () {
       return this.$store.state.danmakuService
     },
+    musicPlatforms () {
+      return this.$root.musicPlatforms
+    },
     isPlaying () {
       return this.$root.isPlaying
     },
@@ -411,6 +420,9 @@ export default {
       if (val == 1) {
         this.$root.startPlayMusic()
       }
+    },
+    'musicConfig.platform' (val) {
+      this.$root.setMusicPlatform(val)
     },
     musicLog () {
       this.$nextTick(() => {

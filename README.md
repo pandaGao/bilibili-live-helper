@@ -5,8 +5,11 @@
 
  Bilibili直播弹幕库 for Mac / Windows / Linux
 
+# Deprecated
+由于历史包袱比较多,弹幕库v1版本即将停止维护,模块化的v2版本正在开发中,后续发布新版本时会使用新的仓库，这个仓库马上会被Archive,目前的issue我都会考虑在v2中实现
+
 ## Download
-最新版本 v1.1.1 [点此前往下载](http://bilibili.danmaku.live)
+最新版本 v1.1.3 [点此前往下载](http://bilibili.danmaku.live)
 
 ## Features
 * 支持 MacOS Windows Linux
@@ -41,6 +44,16 @@
  * Linux用户在启动时需要加上`--enable-transparent-visuals` 和 `--disable-gpu` 参数以支持透明窗口
 
 ## Change Logs
+* 2018-05-17 - v1.1.3
+  * 修复无法登录的问题
+  * 弹幕视图 历史弹幕 弹幕统计 支持显示新版礼物图片
+  * 抽奖支持新版礼物
+  * 调整主界面窗口控制按钮颜色
+* 2018-01-13 - v1.1.2
+  * 点歌模式允许选择音源
+  * 提供界面主题切换功能
+  * 抽奖功能的中奖名单会在不关闭弹幕库的情况下一直保留
+  * 优化更新提示方式
 * 2018-01-05 - v1.1.1
   * 修复点歌无法正确获取播放地址的问题
   * 增加输出当前点歌列表和已完成歌曲列表到文件的功能 用于obs文本捕获

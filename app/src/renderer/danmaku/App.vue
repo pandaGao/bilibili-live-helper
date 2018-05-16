@@ -81,6 +81,7 @@
   export default {
     data () {
       return {
+        giftConfig: {},
         danmakuCount: 0,
         danmakuList: [],
         onlineNumber: '--',
@@ -171,6 +172,17 @@
       this.$electron.ipcRenderer.on('move', (evt, x, y) => {
         this.resetWindow(true, x, y)
       })
+      this.$electron.ipcRenderer.on('roomGiftConfig', (evt, res) => {
+        if (res.length) {
+          this.giftConfig = res.reduce((config, gift) => {
+            config[`${gift.id}`] = gift
+            return config
+          }, {})
+        }
+      })
+    },
+    mounted () {
+      this.$electron.ipcRenderer.send('getRoomGiftConfig')
     },
     methods: {
       addDanmaku (danmaku) {
@@ -193,7 +205,7 @@
         return "guard-user-"+level
       },
       giftImage (id) {
-        return `http://s1.hdslb.com/bfs/static/blive/blfe-live-room/static/img/gift-images/image-png/gift-${id}.png`
+        return this.giftConfig[`${id}`] ? this.giftConfig[`${id}`]['img_dynamic'] : ''
       },
       titleImage (source) {
         if (!source) {

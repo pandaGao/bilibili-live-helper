@@ -203,6 +203,14 @@
             </Col>
           </Row>
         </Card>
+        <Card class="tile-card">
+          <p slot="title">界面主题</p>
+          <Row class="config-row">
+            <Select v-model="config.theme" filterable placement="top">
+              <Option v-for="theme in themeList" :value="theme.id" :key="theme.id">{{ theme.name }} - {{ theme.id }}</Option>
+            </Select>
+          </Row>
+        </Card>
       </Col>
     </Row>
   </div>
@@ -239,7 +247,9 @@ export default {
         useHttps: false,
         useNotification: false,
         useTTS: false,
-        blockSmallTV: true
+        blockSmallTV: true,
+        theme: 'default',
+        themeLink: ''
       },
       ttsConfig: {
         voice: 0,
@@ -256,6 +266,9 @@ export default {
     }
   },
   computed: {
+    themeList () {
+      return this.$root.themeList
+    },
     roomId: {
       get () {
         return this.$store.state.roomId
@@ -323,6 +336,12 @@ export default {
     },
     'config.hideToolbar' () {
       this.$electron.ipcRenderer.send('setHideToolbar', this.config.hideToolbar)
+    },
+    'config.theme' (val) {
+      let target = this.themeList.filter(t => t.id === val)
+      if (target.length) {
+        this.config.themeLink = target[0].link
+      }
     }
   },
   created () {

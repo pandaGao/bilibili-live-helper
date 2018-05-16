@@ -8,10 +8,9 @@ import router from './router.js'
 
 import App from './App.vue'
 
-import * as NeteaseMusic from 'simple-netease-cloud-music'
-import LRC from '../utils/LRCParser.js'
-
-const NM = new NeteaseMusic()
+import * as ThemeService from '../utils/ThemeService.js'
+import * as MusicService from '../utils/MusicService.js'
+import LRC from 'lrc.js'
 
 Vue.use(Electron)
 Vue.use(iView)
@@ -26,12 +25,25 @@ new Vue({
       title: '暂无待播放歌曲',
       singer: ''
     },
+    musicPlatforms: [],
     musicProgress: 0,
     musicPlayed: '00:00',
     musicTotal: '00:00',
     musicLyrics: null,
     musicLyricsLines: [],
-    musicLyricsIdx: -1
+    musicLyricsIdx: -1,
+    lotteryWinnerList: [],
+    themeList: []
+  },
+  computed: {
+    config () {
+      return this.$store.state.config
+    }
+  },
+  watch: {
+    'config.themeLink' (val) {
+      this.injectTheme(val)
+    }
   },
   components: { App },
   router,
@@ -40,6 +52,17 @@ new Vue({
     return createElement(App)
   },
   created () {
+    ThemeService.list().then(res => {
+      this.themeList = res.data
+    })
+    if (this.config.themeLink) {
+      this.injectTheme(this.config.themeLink)
+    }
+    MusicService.platforms().then(res => {
+      if (!res.success) return
+      MusicService.setHost(res.data.host)
+      this.musicPlatforms = res.data.platforms
+    })
     this.musicPlayer.addEventListener('loadedmetadata', () => {
       this.musicTotal = this.formatTime(this.musicPlayer.duration)
     })
@@ -60,7 +83,7 @@ new Vue({
       this.musicPlayed = this.formatTime(this.musicPlayer.currentTime)
       this.musicProgress = this.musicPlayer.currentTime / this.musicPlayer.duration
       if (this.musicLyrics) {
-        this.musicLyricsIdx = this.musicLyrics.findIndex(this.musicPlayer.currentTime * 1000)
+        this.musicLyricsIdx = this.musicLyrics.findIndex(this.musicPlayer.currentTime)
       }
     })
     this.musicPlayer.addEventListener('error', (e) => {
@@ -69,23 +92,42 @@ new Vue({
     })
   },
   methods: {
+    injectTheme (theme) {
+      let link = document.querySelector('#injected-theme')
+      if (link) {
+        link.remove()
+      }
+      if (theme) {
+        link = document.createElement('link')
+        link.id = 'injected-theme'
+        link.rel = 'stylesheet'
+        link.type = 'text/css'
+        link.href = theme
+        document.body.appendChild(link)
+      }
+    },
+    setMusicPlatform (platform) {
+      MusicService.setPlatform(platform)
+    },
     getMusicURL () {
       if (!this.$store.state.musicList.length) return Promise.resolve(false)
-      return NM.search(this.$store.state.musicList[0].name).then(res => {
-        if (res.code === 200 && res.result.songCount && res.result.songs.length) {
-          this.musicInfo.title = res.result.songs[0].name
-          this.musicInfo.singer = res.result.songs[0].ar.map(s => s.name).join(' / ')
-          NM.lyric(res.result.songs[0].id).then(lrcObj => {
-            if (lrcObj.code === 200 && !lrcObj.nolyric && lrcObj.lrc) {
-              let lrc = lrcObj.lrc.lyric
-              this.musicLyrics = new LRC(lrc).parse()
+      return MusicService.search(this.$store.state.musicList[0].name).then(res => {
+        if (res.success && res.data.length) {
+          this.musicInfo.title = res.data[0].name
+          this.musicInfo.singer = res.data[0].artist.map(a => a.name).join(' / ')
+          MusicService.lyric(res.data[0].id).then(lrcObj => {
+            if (lrcObj.success) {
+              let lrc = lrcObj.data.lyric || ''
+              this.musicLyrics = LRC.parse(lrc)
               this.musicLyricsLines = this.musicLyrics.lines
             } else {
               this.$Message.warning('歌词获取失败')
             }
+          }).catch(res => {
+            this.$Message.warning('歌词获取失败')
           })
-          return NM.url(res.result.songs[0].id).then(urlObj => {
-            if (urlObj.code === 200 && urlObj.data.length) {
+          return MusicService.url(res.data[0].id).then(urlObj => {
+            if (urlObj.success && urlObj.data.length) {
               return urlObj.data[0].url
             } else {
               this.$Message.warning('歌曲播放地址获取失败')
@@ -108,6 +150,8 @@ new Vue({
         } else {
           this.nextMusic()
         }
+      }).catch(res => {
+        this.$Message.warning('歌曲信息获取失败')
       })
     },
     nextMusic () {

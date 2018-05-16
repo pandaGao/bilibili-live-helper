@@ -34,18 +34,32 @@
     <Col span="22">
       <router-view class="router-view"></router-view>
     </Col>
+    <Modal
+      v-model="showUpdateModal"
+      title="更新提示">
+      <div class="update-modal-body" v-html="updateInfo"></div>
+      <div slot="footer">
+        <Button type="success" @click="gotoUpdate">前往更新</Button>
+      </div>
+    </Modal>
   </Row>
 </template>
 
 <script>
 import os from 'os'
+import MarkdownIt from 'markdown-it'
 import Statistic from '../utils/Statistic.js'
+
+const md = new MarkdownIt()
 
 export default {
   data () {
     return {
       iconSize: 24,
-      poolPointer: 0
+      poolPointer: 0,
+      showUpdateModal: false,
+      updateInfo: '',
+      downloadLink: ''
     }
   },
   computed: {
@@ -97,6 +111,7 @@ export default {
       if (this.danmakuPool.length) return
       this.poolPointer = 0
       this.$electron.ipcRenderer.send('clearDanmaku')
+      this.getRoomGiftConfig()
     }
   },
   created () {
@@ -108,6 +123,9 @@ export default {
       }
       console.log('online')
     })
+    this.$electron.ipcRenderer.on('getRoomGiftConfig', (evt) => {
+      this.getRoomGiftConfig()
+    })
     this.$electron.ipcRenderer.on('changePage', (evt, url) => {
       this.to(url)
     })
@@ -118,6 +136,13 @@ export default {
     this.$store.dispatch('UPDATE_AREA_LIST')
   },
   methods: {
+    getRoomGiftConfig () {
+      if (this.danmakuService) {
+        this.danmakuService._api.getRoomGiftConfig().then(res => {
+          this.$electron.ipcRenderer.send('roomGiftConfig', res)
+        })
+      }
+    },
     to (path) {
       this.$router.push(path)
     },
@@ -310,15 +335,21 @@ export default {
       }
       this.userService.sendMessage(msg)
     },
-    checkUpdate() {
+    checkUpdate () {
       Statistic.checkUpdate(this.version, os.platform()).then(res => {
-        let data = res.json().then(json => {
-          this.$store.commit('CHECK_UPDATE', {
-            needUpdate: json.needUpdate,
-            latestVersion: json.latestVersion
-          })
+        if (res.data.needUpdate) {
+          this.showUpdateModal = res.data.needUpdate
+          this.updateInfo = md.render(res.data.changeLogs)
+          this.downloadLink = res.data.downloadLink
+        }
+        this.$store.commit('CHECK_UPDATE', {
+          needUpdate: res.data.needUpdate,
+          latestVersion: res.data.latestVersion
         })
       })
+    },
+    gotoUpdate () {
+      this.$electron.shell.openExternal(this.downloadLink)
     },
     minimizeWindow () {
       this.$electron.remote.getCurrentWindow().minimize()
@@ -338,6 +369,10 @@ export default {
   -webkit-app-region no-drag
   padding-left 4px
   margin-bottom 10px
+  button
+    color #80848f
+    &:hover
+      color #1c2438
 .icon-menu
   padding-top 4px
   height 100%
@@ -350,4 +385,24 @@ export default {
     padding 18px 24px
   .ivu-icon
     margin-right 0
+.update-modal-body
+  padding 0 8px
+  height 250px
+  overflow auto
+  font-size 14px
+</style>
+
+<style lang="stylus">
+.update-modal-body
+  hr
+    border 0
+    height 0
+    margin 20px 0
+  ul
+    margin-left 1em
+  li
+    margin-left .5em
+    list-style-type disc
+    li
+      list-style-type circle
 </style>

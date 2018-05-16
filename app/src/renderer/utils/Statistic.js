@@ -1,10 +1,10 @@
 const URL = 'http://bilibili.danmaku.live'
 
 function checkUpdate (version, platform) {
-  let baseURL = URL + '/api/checkUpdate?'
+  let baseURL = `http://api.danmaku.live/v1/updates?`
   let params = [['version', version],['platform', platform]]
   baseURL += params.map(item => item.join('=')).join('&')
-  return fetch(baseURL)
+  return fetch(baseURL).then(res => res.json())
 }
 
 function userLogin (version, platform, uid, room) {
