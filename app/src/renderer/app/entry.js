@@ -10,7 +10,7 @@ import App from './App.vue'
 
 import * as ThemeService from '../utils/ThemeService.js'
 import * as MusicService from '../utils/MusicService.js'
-import LRC from '../utils/LRCParser.js'
+import LRC from 'lrc.js'
 
 Vue.use(Electron)
 Vue.use(iView)
@@ -83,7 +83,7 @@ new Vue({
       this.musicPlayed = this.formatTime(this.musicPlayer.currentTime)
       this.musicProgress = this.musicPlayer.currentTime / this.musicPlayer.duration
       if (this.musicLyrics) {
-        this.musicLyricsIdx = this.musicLyrics.findIndex(this.musicPlayer.currentTime * 1000)
+        this.musicLyricsIdx = this.musicLyrics.findIndex(this.musicPlayer.currentTime)
       }
     })
     this.musicPlayer.addEventListener('error', (e) => {
@@ -118,7 +118,7 @@ new Vue({
           MusicService.lyric(res.data[0].id).then(lrcObj => {
             if (lrcObj.success) {
               let lrc = lrcObj.data.lyric || ''
-              this.musicLyrics = new LRC(lrc).parse()
+              this.musicLyrics = LRC.parse(lrc)
               this.musicLyricsLines = this.musicLyrics.lines
             } else {
               this.$Message.warning('歌词获取失败')

@@ -111,6 +111,7 @@ export default {
       if (this.danmakuPool.length) return
       this.poolPointer = 0
       this.$electron.ipcRenderer.send('clearDanmaku')
+      this.getRoomGiftConfig()
     }
   },
   created () {
@@ -122,6 +123,9 @@ export default {
       }
       console.log('online')
     })
+    this.$electron.ipcRenderer.on('getRoomGiftConfig', (evt) => {
+      this.getRoomGiftConfig()
+    })
     this.$electron.ipcRenderer.on('changePage', (evt, url) => {
       this.to(url)
     })
@@ -132,6 +136,13 @@ export default {
     this.$store.dispatch('UPDATE_AREA_LIST')
   },
   methods: {
+    getRoomGiftConfig () {
+      if (this.danmakuService) {
+        this.danmakuService._api.getRoomGiftConfig().then(res => {
+          this.$electron.ipcRenderer.send('roomGiftConfig', res)
+        })
+      }
+    },
     to (path) {
       this.$router.push(path)
     },
@@ -358,6 +369,10 @@ export default {
   -webkit-app-region no-drag
   padding-left 4px
   margin-bottom 10px
+  button
+    color #80848f
+    &:hover
+      color #1c2438
 .icon-menu
   padding-top 4px
   height 100%

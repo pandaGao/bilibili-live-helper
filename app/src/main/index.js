@@ -152,6 +152,10 @@ function createMainWindow () {
     danmakuWindow.webContents.send('fansNumber', number)
   })
 
+  ipcMain.on('roomGiftConfig', (evt, config) => {
+    danmakuWindow.webContents.send('roomGiftConfig', config)
+  })
+
   // danmakuWindow to mainWindow
   ipcMain.on('changePage', (evt, page) => {
     if (mainWindow.isMinimized()) {
@@ -163,6 +167,10 @@ function createMainWindow () {
 
   ipcMain.on('sendMessage', (evt, msg) => {
     mainWindow.webContents.send('sendMessage', msg)
+  })
+
+  ipcMain.on('getRoomGiftConfig', (evt) => {
+    mainWindow.webContents.send('getRoomGiftConfig')
   })
 
   ipcMain.on('quitApp', (evt) => {

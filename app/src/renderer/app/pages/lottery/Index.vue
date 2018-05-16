@@ -6,9 +6,9 @@
           <p slot="title">抽奖设置</p>
           <Form label-position="left" :label-width="96">
             <Form-item label="礼物类型">
-              <Radio-group v-model="giftType">
-                <Radio v-for="(gift, idx) in giftList" :label="idx" :key="idx">
-                  <img :src="giftImage(gift.id)" :alt="gift.name" class="radio-img">
+              <Radio-group v-model="giftType" class="gift-type">
+                <Radio v-for="(gift, id) in giftConfig" :label="gift.id" :key="id">
+                  <img :src="getRoomGiftImage(gift.id)" :alt="gift.name" class="radio-img">
                 </Radio>
               </Radio-group>
             </Form-item>
@@ -31,7 +31,7 @@
           <Button type="success" v-if="lotteryProcess === 2" @click="doDirectLottery">一发入魂</Button>
           <Button type="error" v-if="lotteryProcess === 3" @click="finishLottery">结束抽奖</Button>
           <br/><br/>
-          <Table v-if="lotteryProcess === 0" size="small" height="285" :columns="winnerListConfig" :data="winnerList"></Table>
+          <Table v-if="lotteryProcess === 0" size="small" height="200" :columns="winnerListConfig" :data="winnerList"></Table>
           <div v-if="lotteryProcess > 0">
             <p>全部参与抽奖人数: {{ playerList.length }}</p>
             <p>当前剩余参与人数: {{ lotteryList.length }}</p>
@@ -70,12 +70,14 @@
 </template>
 
 <script>
+import GiftImageMixin from '../../mixins/giftImage.js'
+
 export default {
+  mixins: [ GiftImageMixin ],
   data () {
     return {
       giftType: 0,
       giftLimit: 1,
-      giftList: [],
       lotteryProcess: 0,
       lotteryRound: 0,
       allowLotteryAgain: false,
@@ -118,9 +120,6 @@ export default {
   },
   mounted () {
     if (this.danmakuService) {
-      this.danmakuService._api.getRoomGiftList().then(res => {
-        this.giftList = res || []
-      })
       this.danmakuService.on('danmaku.message', this.giftHandler)
     }
   },
@@ -144,14 +143,11 @@ export default {
       this.lotteryRound = 0
       this.lotteryProcess = 0
     },
-    giftImage (id) {
-      return `http://s1.hdslb.com/bfs/static/blive/blfe-live-room/static/img/gift-images/image-png/gift-${id}.png`
-    },
     giftHandler (msg) {
-      if (this.lotteryProcess !== 1 || !this.giftList.length) {
+      if (this.lotteryProcess !== 1) {
         return
       }
-      if (msg.type === 'gift' && msg.gift.id === this.giftList[this.giftType].id && msg.gift.count >= this.giftLimit) {
+      if (msg.type === 'gift' && this.giftType == msg.gift.id && this.giftConfig[`${msg.gift.id}`] && msg.gift.count >= this.giftLimit) {
         if (!this.allowLotteryAgain && this.winnerMap[msg.user.id]) {
           return
         }
@@ -187,7 +183,6 @@ export default {
         return
       }
       let lotteryIndex = Math.floor(Math.random() * (this.lotteryList.length))
-      console.log(lotteryIndex)
       this.lotteryList = [ this.lotteryList[lotteryIndex] ]
       this.lotteryProcess = 3
       this.winnerList.push(this.lotteryList[0])
@@ -229,4 +224,7 @@ export default {
     background-color #666
 .lottery-user-name
   color #4fc1e9
+.gift-type
+  height 129px
+  overflow auto
 </style>

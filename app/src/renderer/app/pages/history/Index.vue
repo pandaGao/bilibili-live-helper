@@ -134,7 +134,7 @@
               <div v-else-if="danmaku.type == 'gift'" class="msg-gift">
                 <span class="user-name">{{ danmaku.user.name }}</span>
                 <span class="gift-action">赠送</span>
-                <span class="gift-img"><img :src="giftImage(danmaku.gift.id)"></span>
+                <span class="gift-img"><img :src="getRoomGiftImage(danmaku.gift.id)"></span>
                 <span class="user-gift">{{ `${danmaku.gift.name} × ${danmaku.gift.count}` }}</span>
               </div>
               <div v-else-if="danmaku.type == 'guardBuy'" class="msg-guard-buy">
@@ -160,7 +160,10 @@
 </template>
 
 <script>
+import GiftImageMixin from '../../mixins/giftImage.js'
+
 export default {
+  mixins: [ GiftImageMixin ],
   data () {
     return {
       historyConfig: {
@@ -238,9 +241,6 @@ export default {
     },
     userGuardLevel (level) {
       return "guard-user-"+level
-    },
-    giftImage (id) {
-      return `http://s1.hdslb.com/bfs/static/blive/blfe-live-room/static/img/gift-images/image-png/gift-${id}.png`
     },
     titleImage (source) {
       if (!source) {
