@@ -1,11 +1,11 @@
+<style lang="stylus" scoped>
+.icon-menu-group
+  margin-top 64px
+</style>
 <template>
-  <Row type="flex" class="app-container">
+  <Row type="flex" :class="[containerClass]">
     <Col span="2">
       <Menu theme="dark" :active-name="currentPage" width="auto" class="icon-menu">
-        <div class="toolbar">
-          <Button icon="close-round" type="text" size="small" @click="quitApp"></Button>
-          <Button icon="minus-round" type="text" size="small" @click="minimizeWindow"></Button>
-        </div>
         <div class="icon-menu-group">
           <Menu-item name="/config" @click.native="to('/config')">
             <Icon type="gear-a" :size="25"></Icon>
@@ -55,6 +55,7 @@ const md = new MarkdownIt()
 export default {
   data () {
     return {
+      containerClass: ['app-container', 'platform-' + os.platform()],
       iconSize: 24,
       poolPointer: 0,
       showUpdateModal: false,
@@ -115,6 +116,14 @@ export default {
     }
   },
   created () {
+    window.onbeforeunload = (e) => {
+    
+    if(confirm('真的要退出Bilibili弹幕库吗？')){
+      this.quitApp();
+    }else{
+      e.returnValue = false;
+    }
+  }
     window.addEventListener('online',  () => {
       if (!this.$store.state.danmakuServiceStatus === 'close') {
         this.$store.dispatch({

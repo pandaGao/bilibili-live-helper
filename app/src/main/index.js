@@ -3,7 +3,7 @@
 import electron from 'electron'
 
 const { app, BrowserWindow, dialog, ipcMain, Menu } = electron
-
+const os = require('os');
 app.disableHardwareAcceleration()
 
 let mainWindow, toolbarWindow, danmakuWindow
@@ -39,6 +39,10 @@ const template = [
   }
 ]
 
+const appName = 'Bilibili直播弹幕库'
+
+app.setName(appName) // window.confirm title
+
 function debounce (func, wait, immediate) {
   let timeout
   return function () {
@@ -66,9 +70,11 @@ function createMainWindow () {
   mainWindow = new BrowserWindow({
     width: 1024,
     height: 672,
-    resizable: false,
-    fullscreenable: false,
-    frame: false
+    resizable: true,
+    fullscreenable: true,
+    frame: true,
+    titleBarStyle: 'hidden',
+    autoHideMenuBar: true
   })
 
   mainWindow.loadURL(mainURL)
@@ -176,17 +182,7 @@ function createMainWindow () {
   })
 
   ipcMain.on('quitApp', (evt) => {
-    dialog.showMessageBox({
-      type: 'warning',
-      message: '真的要退出Bilibili弹幕库吗？',
-      buttons: ['是', '否'],
-      defaultId: 0,
-      cancelId: 1
-    }, (res) => {
-      if (res === 0) {
-        app.quit()
-      }
-    })
+    app.quit()
   })
 }
 
