@@ -3,17 +3,17 @@
   "version": "1.1.3",
   "description": "An electron-vue project",
   "scripts": {
-    "build": "cd app && rm -rf node_modules && cd .. && rm -rf node_modules && npm i && node tasks/release.js",
+    "build": "cd app && rm -rf node_modules && cd .. && rm -rf node_modules && yarn install && node tasks/release.js",
     "build:clean": "cross-env PLATFORM_TARGET=clean node tasks/release.js",
     "build:darwin": "cross-env PLATFORM_TARGET=darwin node tasks/release.js",
     "build:linux": "cross-env PLATFORM_TARGET=linux node tasks/release.js",
     "build:mas": "cross-env PLATFORM_TARGET=mas node tasks/release.js",
     "build:win32": "cross-env PLATFORM_TARGET=win32 node tasks/release.js",
     "dev": "node tasks/runner.js",
-    "pack": "npm run pack:main && npm run pack:renderer",
+    "pack": "yarn run pack:main && yarn run pack:renderer",
     "pack:main": "cross-env NODE_ENV=production webpack -p --progress --colors --config webpack.main.config.js",
     "pack:renderer": "cross-env NODE_ENV=production webpack -p --progress --colors --config webpack.renderer.config.js",
-    "postinstall": "cd app && npm i"
+    "postinstall": "cd app && yarn install"
   },
   "author": "Greg Holguin <simulatedgreg@gmail.com>",
   "license": "MIT",
