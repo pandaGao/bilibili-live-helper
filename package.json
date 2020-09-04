@@ -46,7 +46,7 @@
     "style-loader": "^0.13.1",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",
-    "tree-kill": "^1.1.0",
+    "tree-kill": "^1.2.2",
     "url-loader": "^0.5.7",
     "vue-hot-reload-api": "^2.0.7",
     "vue-html-loader": "^1.2.2",
