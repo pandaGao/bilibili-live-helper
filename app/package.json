@@ -10,7 +10,7 @@
     "iview": "^2.0.0-rc.17",
     "lodash": "^4.17.4",
     "lrc.js": "^1.0.0",
-    "markdown-it": "^8.4.0",
+    "markdown-it": "^12.3.2",
     "vue": "^2.1.10",
     "vue-electron": "^1.0.6",
     "vue-router": "^2.1.2",
