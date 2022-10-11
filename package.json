@@ -33,7 +33,7 @@
     "electron": "1.4.16",
     "electron-debug": "^1.1.0",
     "electron-devtools-installer": "^2.0.1",
-    "electron-packager": "^8.5.0",
+    "electron-packager": "^16.0.0",
     "extract-text-webpack-plugin": "^2.0.0-beta.4",
     "file-loader": "^0.9.0",
     "html-webpack-plugin": "^2.16.1",
